@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laravel Study Lab</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand">
+      <h1>Laravel<br><span>Study Lab</span></h1>
+      <div class="progress-summary" id="progressSummary">0% complete</div>
+    </div>
+    <nav id="lessonNav"></nav>
+    <div class="sidebar-footer">
+      <button id="resetBtn" title="Wipe all progress">Reset progress</button>
+    </div>
+  </aside>
+
+  <main id="content">
+    <div id="welcome" class="view">
+      <h2>Welcome</h2>
+      <p>This is your hands-on Laravel study lab. It's built for someone starting from zero — no PHP, no frameworks. Everything you need to learn is here, in order.</p>
+
+      <h3>How it works</h3>
+      <ol>
+        <li><strong>Read</strong> the concept on each lesson page.</li>
+        <li><strong>Study</strong> the code example carefully — read every line.</li>
+        <li><strong>Try</strong> the exercise yourself before peeking at the solution.</li>
+        <li><strong>Quiz</strong> yourself — wrong answers explain why.</li>
+        <li><strong>Mark complete</strong> only when you genuinely understand it.</li>
+      </ol>
+
+      <h3>The path</h3>
+      <ul>
+        <li><strong>Module 1 — PHP Foundations:</strong> The language Laravel is built on.</li>
+        <li><strong>Module 2 — Web &amp; Database Basics:</strong> What a web framework actually does.</li>
+        <li><strong>Module 3 — Laravel Core:</strong> Routing, controllers, Blade, Eloquent, validation, auth.</li>
+        <li><strong>Module 4 — Debug Challenges:</strong> Broken code to fix from memory.</li>
+      </ul>
+
+      <p class="cta">Pick a lesson from the left to start. Recommended: begin with <em>1.1 What is PHP</em>.</p>
+    </div>
+
+    <div id="lessonView" class="view hidden">
+      <header class="lesson-header">
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <h2 id="lessonTitle"></h2>
+      </header>
+
+      <section class="concept">
+        <h3>Concept</h3>
+        <div id="lessonConcept"></div>
+      </section>
+
+      <section class="example">
+        <h3>Code example</h3>
+        <div id="lessonExample"></div>
+      </section>
+
+      <section class="exercise" id="exerciseSection">
+        <h3>Exercise — try it yourself</h3>
+        <div id="lessonExercise"></div>
+        <textarea id="exerciseInput" placeholder="Type your answer here..."></textarea>
+        <div class="exercise-buttons">
+          <button id="showSolutionBtn">Show solution</button>
+          <button id="hideSolutionBtn" class="hidden">Hide solution</button>
+        </div>
+        <div id="solutionBox" class="hidden">
+          <h4>Solution</h4>
+          <div id="lessonSolution"></div>
+        </div>
+      </section>
+
+      <section class="quiz" id="quizSection">
+        <h3>Quiz</h3>
+        <div id="lessonQuiz"></div>
+      </section>
+
+      <footer class="lesson-footer">
+        <button id="markCompleteBtn">Mark lesson complete</button>
+        <div class="nav-buttons">
+          <button id="prevBtn">← Previous</button>
+          <button id="nextBtn">Next →</button>
+        </div>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script src="lessons.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
