@@ -707,13 +707,14 @@ SELECT * FROM posts WHERE user_id = 3;`,
         id: '3.1',
         title: 'Installing Laravel and project structure',
         concept: `
-          <p>To install Laravel you need PHP 8.2+ and Composer. On Windows the easiest path is:</p>
+          <p>The current release is <strong>Laravel 13</strong> (March 2026). It needs <strong>PHP 8.3+</strong> and Composer. On Windows the easiest path is:</p>
           <ol>
-            <li>Install <a href="https://www.php.net/downloads.php" target="_blank">PHP</a> (or use <a href="https://laragon.org" target="_blank">Laragon</a>, which bundles everything).</li>
+            <li>Install <a href="https://www.php.net/downloads.php" target="_blank">PHP 8.3+</a> (or use <a href="https://laragon.org" target="_blank">Laragon</a>, which bundles everything).</li>
             <li>Install <a href="https://getcomposer.org" target="_blank">Composer</a>.</li>
-            <li>Run: <code>composer create-project laravel/laravel my-app</code></li>
+            <li>Install the official installer once: <code>composer global require laravel/installer</code>, then create apps with <code>laravel new my-app</code>. (The older <code>composer create-project laravel/laravel my-app</code> still works.)</li>
             <li>Inside the project: <code>php artisan serve</code> — starts a dev server at <code>http://127.0.0.1:8000</code>.</li>
           </ol>
+          <div class="callout tip"><strong>New in Laravel 13:</strong> routes under <code>api/*</code> now return JSON error responses by default (no <code>Accept: application/json</code> header needed), and the first-party <strong>Laravel AI SDK</strong> is stable. The streamlined <code>bootstrap/app.php</code> config introduced in Laravel 11 is still the standard.</div>
           <p>Key folders in a Laravel project:</p>
           <ul>
             <li><code>app/</code> — your app's PHP code (Models, Controllers, etc.)</li>
@@ -726,8 +727,10 @@ SELECT * FROM posts WHERE user_id = 3;`,
             <li><code>artisan</code> — the CLI tool. Run things with <code>php artisan ...</code></li>
           </ul>
         `,
-        example: `# Create a new Laravel app
-composer create-project laravel/laravel my-app
+        example: `# Create a new Laravel 13 app (official installer)
+laravel new my-app
+# ...or with Composer directly:
+# composer create-project laravel/laravel my-app
 cd my-app
 
 # Start the dev server
@@ -1340,7 +1343,7 @@ class PostController extends Controller {
         concept: `
           <p><strong>Middleware</strong> is code that runs before (or after) a request hits a controller. Auth, throttling, logging — all middleware.</p>
           <p>Create one: <code>php artisan make:middleware EnsureUserIsAdmin</code>. The handle() method either returns <code>$next($request)</code> (continue) or returns its own response (redirect, abort, etc).</p>
-          <p>Register it in <code>bootstrap/app.php</code> (Laravel 11+) or <code>app/Http/Kernel.php</code> (older). Then apply via <code>-&gt;middleware('admin')</code> on routes.</p>
+          <p>Register it in <code>bootstrap/app.php</code> (Laravel 11 through 13) or <code>app/Http/Kernel.php</code> (Laravel 10 and older). Then apply via <code>-&gt;middleware('admin')</code> on routes.</p>
           <p><strong>Sessions</strong> persist data across requests for one user:</p>
           <pre><code>session()-&gt;put('cart_count', 3);
 $count = session('cart_count');
@@ -1369,7 +1372,7 @@ class EnsureUserIsAdmin {
     }
 }
 
-// bootstrap/app.php (Laravel 11+)
+// bootstrap/app.php (Laravel 11 through 13)
 ->withMiddleware(function (Middleware $middleware) {
     $middleware->alias([
         'admin' => \\App\\Http\\Middleware\\EnsureUserIsAdmin::class,

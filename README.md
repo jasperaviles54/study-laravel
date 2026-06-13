@@ -1,6 +1,6 @@
 # Laravel Study Lab
 
-A self-contained, single-page study app for learning Laravel from scratch — no PHP background required. Lessons, code examples, exercises with solutions, and quizzes. Progress is saved in the browser via `localStorage`.
+A self-contained, single-page study app for learning Laravel from scratch — no PHP background required. Lessons, code examples, exercises with solutions, and quizzes. Content targets **Laravel 13** (PHP 8.3+). Progress is saved in the browser via `localStorage`.
 
 ## Contents
 
@@ -34,7 +34,7 @@ Future `git push` calls redeploy automatically.
 ## File layout
 
 ```
-laravel-study/
+study-laravel/
 ├── index.html      # page shell
 ├── styles.css      # dark theme
 ├── lessons.js      # all lesson content as JS data

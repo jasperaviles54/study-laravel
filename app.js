@@ -43,7 +43,10 @@ function highlightCode(rawCode) {
     'namespace','new','null','private','protected','public','require','return','static',
     'switch','this','throw','trait','true','false','try','use','var','void','while','yield'
   ];
-  const kwRe = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'g');
+  // The negative lookahead `(?!=)` prevents matching the keyword `class` inside
+  // the `class="..."` attributes of spans inserted by the comment/string steps
+  // above — without it, those attributes get double-wrapped into broken HTML.
+  const kwRe = new RegExp('\\b(' + keywords.join('|') + ')\\b(?!=)', 'g');
   code = code.replace(kwRe, '<span class="kw">$1</span>');
 
   // 5) Variables: $word
