@@ -8,6 +8,7 @@ A self-contained, single-page study app for learning Laravel from scratch — no
 - **Module 2 — Web & DB Basics** (3 lessons): HTTP, MVC, SQL
 - **Module 3 — Laravel Core** (10 lessons): install, routing, controllers, Blade, migrations, Eloquent, relationships, validation, auth, middleware
 - **Module 4 — Debug Challenges** (4 lessons): broken route, broken query, mass-assignment, broken Blade
+- **Module 5 — Build It** (9 lessons): a guided build-along capstone — create a real Laravel blog (setup, Breeze auth, posts, controllers/routes, Blade, validation, comments, testing, deploy). Requires a local Laravel install (PHP 8.3+, Composer, Node).
 
 ## Run it locally
 

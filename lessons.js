@@ -1175,6 +1175,389 @@ class Post extends Model {
 // Collection on the left, loop variable on the right.`,
       }
     ]
+  },
+  {
+    id: 'm5',
+    title: 'Module 5 — Build It',
+    lessons: [
+      {
+        id: '5.1',
+        title: 'Set up the project and database',
+        concept: `
+          <p>Time to build something real. Over this module you'll create a working blog: logged-in users write posts, anyone can read them, and posts have comments. <strong>Open a terminal and build alongside each lesson</strong> — reading isn't enough here.</p>
+          <div class="callout warn"><strong>Prerequisites.</strong> You need <code>PHP 8.3+</code>, <a href="https://getcomposer.org" target="_blank">Composer</a>, and <a href="https://nodejs.org" target="_blank">Node.js</a> (used to compile front-end assets in the next lesson). On Windows, <a href="https://laragon.org" target="_blank">Laragon</a> bundles PHP + Composer for you.</div>
+          <p>Create the app and start it:</p>
+          <ol>
+            <li><code>laravel new blog</code> (or <code>composer create-project laravel/laravel blog</code>)</li>
+            <li><code>cd blog</code></li>
+            <li><code>php artisan serve</code> — visit <code>http://127.0.0.1:8000</code></li>
+          </ol>
+          <p>New Laravel apps use <strong>SQLite</strong> by default — a single file at <code>database/database.sqlite</code>, zero setup. Confirm your <code>.env</code> has <code>DB_CONNECTION=sqlite</code>, then run the starter migrations to create the tables (including <code>users</code>).</p>
+        `,
+        example: `# Create and run the app
+laravel new blog
+cd blog
+
+# .env (SQLite is the default in Laravel 11+)
+DB_CONNECTION=sqlite
+
+# Create the database file + run the built-in migrations
+php artisan migrate
+
+# Start the dev server
+php artisan serve
+# Visit http://127.0.0.1:8000`,
+        exercise: `<p>Write the commands to (a) create a new Laravel app called <code>blog</code>, (b) move into it, and (c) run the initial migrations.</p>`,
+        solution: `laravel new blog
+cd blog
+php artisan migrate`,
+      },
+      {
+        id: '5.2',
+        title: 'Add authentication (Breeze)',
+        concept: `
+          <p>Rather than hand-rolling login, scaffold it with <strong>Laravel Breeze</strong> (you met it in 3.9). It generates register/login/logout/password-reset routes, controllers, and Blade views.</p>
+          <ol>
+            <li><code>composer require laravel/breeze --dev</code> — add Breeze as a dev dependency.</li>
+            <li><code>php artisan breeze:install blade</code> — publish the Blade auth stack.</li>
+            <li><code>npm install &amp;&amp; npm run build</code> — compile the Tailwind/Vite assets Breeze ships.</li>
+            <li><code>php artisan migrate</code> — apply any new migrations.</li>
+          </ol>
+          <p>Now <code>/register</code> and <code>/login</code> work, and you have a <code>/dashboard</code> behind the <code>auth</code> middleware. Register yourself an account — you'll author posts as that user next.</p>
+          <div class="callout tip">Breeze is front-end assets + Blade. That's why Node is required: <code>npm run build</code> compiles the CSS/JS into <code>public/build</code>.</div>
+        `,
+        example: `# 1. Require Breeze (dev only)
+composer require laravel/breeze --dev
+
+# 2. Scaffold the Blade auth stack
+php artisan breeze:install blade
+
+# 3. Compile the published front-end assets
+npm install
+npm run build
+
+# 4. Run migrations
+php artisan migrate
+
+# Now register at http://127.0.0.1:8000/register`,
+        exercise: `<p>Write the four commands to add Breeze auth: require the package (dev), install the Blade stack, build the front-end assets, and run migrations.</p>`,
+        solution: `composer require laravel/breeze --dev
+php artisan breeze:install blade
+npm install && npm run build
+php artisan migrate`,
+      },
+      {
+        id: '5.3',
+        title: 'Posts: migration, model and relationships',
+        concept: `
+          <p>A post belongs to the user who wrote it. Generate the model and its migration together with <code>-m</code>, define the schema, then wire the relationships.</p>
+          <ul>
+            <li><code>php artisan make:model Post -m</code></li>
+            <li>In the migration's <code>up()</code>, add a <code>user_id</code> foreign key, a <code>title</code>, a <code>body</code>, and timestamps.</li>
+            <li>On <code>Post</code>, set <code>$fillable</code> (so <code>Post::create([...])</code> works) and a <code>user()</code> <code>belongsTo</code> relationship.</li>
+            <li>On <code>User</code>, add a <code>posts()</code> <code>hasMany</code> relationship.</li>
+          </ul>
+          <p>Then <code>php artisan migrate</code> to create the <code>posts</code> table.</p>
+        `,
+        example: `php artisan make:model Post -m
+
+// database/migrations/...create_posts_table.php — up()
+Schema::create('posts', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->string('title');
+    $table->text('body');
+    $table->timestamps();
+});
+
+// app/Models/Post.php
+class Post extends Model {
+    protected $fillable = ['title', 'body', 'user_id'];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+}
+
+// app/Models/User.php — add this method
+public function posts() {
+    return $this->hasMany(Post::class);
+}`,
+        exercise: `<p>Write the posts migration <code>up()</code> body: an id, a <code>user_id</code> foreign key to users (cascade on delete), a <code>title</code> string, a <code>body</code> text column, and timestamps. Then add <code>$fillable</code> to the Post model.</p>`,
+        solution: `Schema::create('posts', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->string('title');
+    $table->text('body');
+    $table->timestamps();
+});
+
+// app/Models/Post.php
+protected $fillable = ['title', 'body', 'user_id'];`,
+      },
+      {
+        id: '5.4',
+        title: 'PostController and routes',
+        concept: `
+          <p>Generate a resource controller and wire the routes. Reading is public; creating requires login.</p>
+          <ul>
+            <li><code>php artisan make:controller PostController --resource</code></li>
+            <li>Public: <code>index</code> (list) and <code>show</code> (one post).</li>
+            <li>Behind <code>auth</code> middleware: <code>create</code> (form) and <code>store</code> (save).</li>
+          </ul>
+          <div class="callout warn"><strong>Route order matters.</strong> Define <code>/posts/create</code> <em>before</em> <code>/posts/{post}</code> — otherwise <code>{post}</code> captures the literal word "create" as an id. Routes match top to bottom.</div>
+          <p><code>show(Post $post)</code> uses <strong>route-model binding</strong>: type-hint the model and Laravel fetches it from the <code>{post}</code> id automatically (404 if missing).</p>
+        `,
+        example: `php artisan make:controller PostController --resource
+
+// routes/web.php
+use App\\Http\\Controllers\\PostController;
+
+Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+});
+
+Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
+// app/Http/Controllers/PostController.php
+public function index() {
+    $posts = Post::latest()->get();
+    return view('posts.index', ['posts' => $posts]);
+}
+
+public function show(Post $post) {
+    return view('posts.show', ['post' => $post]);
+}`,
+        exercise: `<p>Write the <code>index()</code> method: fetch all posts newest-first and pass them to a <code>posts.index</code> view as <code>'posts'</code>.</p>`,
+        solution: `public function index() {
+    $posts = Post::latest()->get();
+    return view('posts.index', ['posts' => $posts]);
+}`,
+      },
+      {
+        id: '5.5',
+        title: 'Blade views and layout',
+        concept: `
+          <p>Build the views. A shared <strong>layout</strong> holds the page shell; each page <code>@extends</code> it and fills a <code>@section</code>.</p>
+          <ul>
+            <li><code>layouts/app.blade.php</code> — the shell with <code>@yield('content')</code>.</li>
+            <li><code>posts/index.blade.php</code> — loop <code>$posts</code>, link each to its show page.</li>
+            <li><code>posts/show.blade.php</code> — print one post.</li>
+          </ul>
+          <p>Use <code>{{ }}</code> (auto-escaped) for output and the <code>route()</code> helper for links so URLs aren't hard-coded.</p>
+        `,
+        example: `{{-- resources/views/layouts/app.blade.php --}}
+<!DOCTYPE html>
+<html>
+<head><title>@yield('title', 'My Blog')</title></head>
+<body>
+    <main>@yield('content')</main>
+</body>
+</html>
+
+{{-- resources/views/posts/index.blade.php --}}
+@extends('layouts.app')
+@section('content')
+    <h1>Posts</h1>
+    @foreach ($posts as $post)
+        <article>
+            <h2><a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a></h2>
+            <p>by {{ $post->user->name }}</p>
+        </article>
+    @endforeach
+@endsection
+
+{{-- resources/views/posts/show.blade.php --}}
+@extends('layouts.app')
+@section('content')
+    <h1>{{ $post->title }}</h1>
+    <p>{{ $post->body }}</p>
+@endsection`,
+        exercise: `<p>Write a Blade snippet for <code>posts/index</code> that loops over <code>$posts</code> and, for each, links to its show page with the <code>route()</code> helper and prints the title.</p>`,
+        solution: `@foreach ($posts as $post)
+    <a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a>
+@endforeach`,
+      },
+      {
+        id: '5.6',
+        title: 'Create posts with validation',
+        concept: `
+          <p>Wire the create form and the <code>store</code> handler. Validate input, attach the logged-in user, save, then redirect.</p>
+          <ul>
+            <li>Every non-GET form needs <code>@csrf</code>.</li>
+            <li><code>$request-&gt;validate([...])</code> redirects back with errors if it fails.</li>
+            <li><code>{{ old('field') }}</code> refills input; <code>@error('field')</code> shows the message.</li>
+            <li>Set <code>user_id</code> from <code>$request-&gt;user()-&gt;id</code> — never trust the client for the author.</li>
+          </ul>
+        `,
+        example: `// PostController
+public function create() {
+    return view('posts.create');
+}
+
+public function store(Request $request) {
+    $validated = $request->validate([
+        'title' => 'required|max:255',
+        'body'  => 'required',
+    ]);
+    $validated['user_id'] = $request->user()->id;
+    Post::create($validated);
+    return redirect()->route('posts.index')->with('status', 'Post created!');
+}
+
+{{-- resources/views/posts/create.blade.php --}}
+<form method="POST" action="{{ route('posts.store') }}">
+    @csrf
+    <input name="title" value="{{ old('title') }}">
+    @error('title') <p>{{ $message }}</p> @enderror
+    <textarea name="body">{{ old('body') }}</textarea>
+    @error('body') <p>{{ $message }}</p> @enderror
+    <button>Save</button>
+</form>`,
+        exercise: `<p>Write the <code>store()</code> method: validate <code>title</code> (required, max 255) and <code>body</code> (required), attach the logged-in user's id, create the post, and redirect to <code>posts.index</code>.</p>`,
+        solution: `public function store(Request $request) {
+    $validated = $request->validate([
+        'title' => 'required|max:255',
+        'body'  => 'required',
+    ]);
+    $validated['user_id'] = $request->user()->id;
+    Post::create($validated);
+    return redirect()->route('posts.index');
+}`,
+      },
+      {
+        id: '5.7',
+        title: 'Comments',
+        concept: `
+          <p>Add comments: a comment belongs to a post; a post has many comments. Same pattern as posts/users.</p>
+          <ul>
+            <li><code>php artisan make:model Comment -m</code>, with a <code>post_id</code> foreign key and a <code>body</code>.</li>
+            <li><code>Comment</code> → <code>belongsTo(Post::class)</code>; <code>Post</code> → <code>hasMany(Comment::class)</code>.</li>
+            <li>Nest the route under its post: <code>POST /posts/{post}/comments</code>.</li>
+          </ul>
+          <p>In the post's show view you can then loop <code>$post-&gt;comments</code> and render a small comment form.</p>
+        `,
+        example: `php artisan make:model Comment -m
+
+// comments migration — up()
+Schema::create('comments', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('post_id')->constrained()->onDelete('cascade');
+    $table->text('body');
+    $table->timestamps();
+});
+
+// app/Models/Comment.php
+protected $fillable = ['body', 'post_id'];
+public function post() {
+    return $this->belongsTo(Post::class);
+}
+
+// app/Models/Post.php — add this method
+public function comments() {
+    return $this->hasMany(Comment::class);
+}
+
+// routes/web.php
+Route::post('/posts/{post}/comments', [CommentController::class, 'store'])
+    ->name('comments.store');`,
+        exercise: `<p>Write the two relationship methods that connect comments and posts: a comment belongs to a post, and a post has many comments.</p>`,
+        solution: `// app/Models/Comment.php
+public function post() {
+    return $this->belongsTo(Post::class);
+}
+
+// app/Models/Post.php
+public function comments() {
+    return $this->hasMany(Comment::class);
+}`,
+      },
+      {
+        id: '5.8',
+        title: 'Test it',
+        concept: `
+          <p>Don't just click around — prove it works with an automated <strong>feature test</strong>. Laravel ships with PHPUnit/Pest and helpers for HTTP and the database.</p>
+          <ul>
+            <li><code>php artisan make:test PostTest</code> creates a test in <code>tests/Feature</code>.</li>
+            <li>The <code>RefreshDatabase</code> trait gives each test a clean database.</li>
+            <li><code>$this-&gt;actingAs($user)</code> logs in for the request.</li>
+            <li><code>assertDatabaseHas('posts', [...])</code> checks the row was written.</li>
+          </ul>
+          <p>Run the whole suite with <code>php artisan test</code>.</p>
+        `,
+        example: `php artisan make:test PostTest
+
+// tests/Feature/PostTest.php
+use App\\Models\\User;
+use Illuminate\\Foundation\\Testing\\RefreshDatabase;
+
+class PostTest extends TestCase {
+    use RefreshDatabase;
+
+    public function test_a_user_can_create_a_post(): void {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post('/posts', [
+            'title' => 'Hello',
+            'body'  => 'World',
+        ]);
+
+        $response->assertRedirect('/posts');
+        $this->assertDatabaseHas('posts', ['title' => 'Hello']);
+    }
+}
+
+// Run it:
+php artisan test`,
+        exercise: `<p>Write a feature test body that, as a logged-in user, POSTs a new post to <code>/posts</code> and asserts the database has a <code>posts</code> row with title <code>'Hello'</code>.</p>`,
+        solution: `$user = User::factory()->create();
+
+$this->actingAs($user)->post('/posts', [
+    'title' => 'Hello',
+    'body'  => 'World',
+]);
+
+$this->assertDatabaseHas('posts', ['title' => 'Hello']);`,
+      },
+      {
+        id: '5.9',
+        title: 'Deploy',
+        concept: `
+          <p>Last step: ship it. Production differs from local in a few important ways.</p>
+          <ul>
+            <li><code>APP_ENV=production</code> and <code>APP_DEBUG=false</code> — never expose stack traces to users.</li>
+            <li><code>php artisan key:generate</code> — set <code>APP_KEY</code> (used to encrypt sessions/cookies).</li>
+            <li><code>npm run build</code> — compile optimized, versioned front-end assets.</li>
+            <li><code>php artisan config:cache</code> + <code>route:cache</code> — faster boot (re-run after changes).</li>
+            <li><code>php artisan migrate --force</code> — run migrations non-interactively.</li>
+          </ul>
+          <p>Hosting options: managed platforms like <strong>Laravel Forge</strong>/Cloud, a VPS, or any host with PHP 8.3+ and Composer. Point the web root at <code>public/</code>.</p>
+          <div class="callout tip">SQLite is fine for small sites, but most production apps switch <code>DB_CONNECTION</code> to MySQL or PostgreSQL.</div>
+        `,
+        example: `# Production .env
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://yourblog.com
+
+# One-time: generate the app encryption key
+php artisan key:generate
+
+# Build front-end assets for production
+npm run build
+
+# Cache config + routes, then migrate non-interactively
+php artisan config:cache
+php artisan route:cache
+php artisan migrate --force`,
+        exercise: `<p>Write the production commands to (a) generate the app key, (b) build the front-end assets, and (c) run migrations non-interactively.</p>`,
+        solution: `php artisan key:generate
+npm run build
+php artisan migrate --force`,
+      }
+    ]
   }
 ];
 
@@ -1357,6 +1740,69 @@ const QUIZZES = {
     { q: "What is the correct foreach syntax in Blade?", options: ["@foreach ($post as $posts)", "@foreach ($posts as $post)", "@for ($posts as $post)", "@each ($posts, $post)"], correct: 1, explain: "Collection on the left, single item on the right: @foreach ($posts as $post)." },
     { q: "Inside the loop, how do you print each post's title?", options: ["{{ $posts->title }}", "{{ $post->title }}", "{{ post.title }}", "{{ $post[title] }}"], correct: 1, explain: "Use the singular loop variable: {{ $post->title }}." },
   ],
+  '5.1': [
+    { q: "Which command creates a brand-new Laravel application called blog?", options: ["php artisan new blog", "laravel new blog", "composer blog", "npm create laravel blog"], correct: 1, explain: "laravel new blog (or composer create-project laravel/laravel blog) scaffolds a new app." },
+    { q: "What database does a fresh Laravel 11+ app use by default?", options: ["MySQL", "PostgreSQL", "SQLite", "MongoDB"], correct: 2, explain: "New apps default to SQLite — a single file at database/database.sqlite, no setup." },
+    { q: "What does php artisan serve do?", options: ["Deploys the app", "Starts a local development server", "Builds front-end assets", "Creates a controller"], correct: 1, explain: "It serves the app locally, by default at http://127.0.0.1:8000." },
+    { q: "Which command applies the database migrations?", options: ["php artisan migrate", "php artisan db", "php artisan serve", "composer migrate"], correct: 0, explain: "php artisan migrate runs pending migrations and creates the tables." },
+    { q: "Which .env key selects the database driver?", options: ["DB_DRIVER", "DB_CONNECTION", "DATABASE", "DB_TYPE"], correct: 1, explain: "DB_CONNECTION (e.g. sqlite, mysql) chooses the driver." },
+  ],
+  '5.2': [
+    { q: "What does Laravel Breeze provide?", options: ["A database GUI", "Authentication scaffolding (login, register, etc.)", "A deployment tool", "A testing framework"], correct: 1, explain: "Breeze scaffolds login, registration, password reset, and email verification." },
+    { q: "How is Breeze installed?", options: ["npm install breeze", "composer require laravel/breeze --dev", "php artisan breeze", "apt install breeze"], correct: 1, explain: "Add it as a dev dependency, then run php artisan breeze:install." },
+    { q: "After requiring Breeze, which command scaffolds the Blade auth views?", options: ["php artisan breeze:install blade", "php artisan make:auth", "php artisan vendor:publish", "npm run breeze"], correct: 0, explain: "php artisan breeze:install blade publishes routes, controllers, and Blade views." },
+    { q: "Why run npm install && npm run build after installing Breeze?", options: ["To install PHP", "To compile the CSS/JS assets Breeze published", "To run migrations", "To start the server"], correct: 1, explain: "Breeze ships Tailwind/Vite assets that must be compiled with Node." },
+    { q: "Which middleware protects routes that require login?", options: ["guest", "auth", "verified", "web"], correct: 1, explain: "The auth middleware restricts routes to authenticated users." },
+  ],
+  '5.3': [
+    { q: "Which command makes a Post model and its migration together?", options: ["php artisan make:model Post", "php artisan make:model Post -m", "php artisan make:migration Post", "php artisan model Post --table"], correct: 1, explain: "The -m flag also generates the migration alongside the model." },
+    { q: "Which line adds a foreign key from posts to users?", options: ["$table->integer('user_id')", "$table->foreignId('user_id')->constrained()", "$table->foreign('user')", "$table->users()"], correct: 1, explain: "foreignId('user_id')->constrained() infers the users table and adds the constraint." },
+    { q: "On the Post model, which relationship points back to its author?", options: ["hasMany", "hasOne", "belongsTo", "belongsToMany"], correct: 2, explain: "A post belongs to one user: belongsTo(User::class)." },
+    { q: "Why does Post need a $fillable array?", options: ["For speed", "To allow those fields in Post::create([...]) (mass assignment)", "To define the table", "To add indexes"], correct: 1, explain: "Mass-assignment protection: only listed fields can be set via create()/update() arrays." },
+    { q: "On the User model, the matching relationship to many posts is...", options: ["belongsTo(Post::class)", "hasMany(Post::class)", "hasOne(Post::class)", "morphMany(Post::class)"], correct: 1, explain: "A user has many posts: hasMany(Post::class)." },
+  ],
+  '5.4': [
+    { q: "Which command creates a controller with the 7 resource methods?", options: ["make:controller PostController", "make:controller PostController --resource", "make:resource PostController", "make:model PostController"], correct: 1, explain: "The --resource flag scaffolds index/create/store/show/edit/update/destroy." },
+    { q: "How do you restrict create/store routes to logged-in users?", options: ["Route::middleware('auth')->group(...)", "Route::auth()", "Route::secure()", "Add @auth in the route file"], correct: 0, explain: "Wrap them in Route::middleware('auth')->group(...)." },
+    { q: "Why define /posts/create before /posts/{post}?", options: ["Alphabetical order", "Otherwise {post} captures \"create\" as an id", "It runs faster", "Laravel requires it"], correct: 1, explain: "Routes match top-down; {post} would match the literal \"create\" if defined first." },
+    { q: "What does Post::latest()->get() return?", options: ["One post", "All posts, newest first", "A query builder", "A boolean"], correct: 1, explain: "latest() orders by created_at desc; get() executes and returns the collection." },
+    { q: "With route-model binding, what does show(Post $post) give you?", options: ["The id only", "The matching Post instance, fetched automatically", "A query builder", "Nothing"], correct: 1, explain: "Type-hinting Post $post auto-resolves the model from the {post} route key (404 if missing)." },
+  ],
+  '5.5': [
+    { q: "Which directive outputs an escaped value in Blade?", options: ["{!! $x !!}", "{{ $x }}", "<?= $x ?>", "@$x"], correct: 1, explain: "{{ }} escapes HTML to prevent XSS; {!! !!} prints raw." },
+    { q: "How does a child view use a layout?", options: ["@include('layouts.app')", "@extends('layouts.app') plus @section", "@use('layouts.app')", "@layout('app')"], correct: 1, explain: "@extends names the layout; @section fills its @yield slots." },
+    { q: "Which helper generates the URL for a named route?", options: ["url('posts.show')", "route('posts.show', $post)", "link('posts.show')", "path('posts.show')"], correct: 1, explain: "route('posts.show', $post) builds the URL from the route name." },
+    { q: "Which directive loops over a collection in Blade?", options: ["@for", "@foreach", "@each", "@loop"], correct: 1, explain: "@foreach ($posts as $post) ... @endforeach." },
+    { q: "In the layout, where does a child's section render?", options: ["@section", "@yield", "@show", "@slot"], correct: 1, explain: "@yield('content') marks where the child's @section('content') is injected." },
+  ],
+  '5.6': [
+    { q: "Which method validates incoming request data?", options: ["$request->check()", "$request->validate([...])", "$request->verify()", "validate($request)"], correct: 1, explain: "$request->validate([...]) validates and redirects back with errors on failure." },
+    { q: "What does @csrf add to a form?", options: ["Styling", "A hidden token preventing cross-site request forgery", "Validation rules", "A submit button"], correct: 1, explain: "Every non-GET form needs @csrf or Laravel rejects the request." },
+    { q: "How do you set the author on the new post?", options: ["$validated['user_id'] = $request->user()->id", "Post::author()", "Laravel fills it automatically", "$post->user = true"], correct: 0, explain: "Attach the logged-in user id before creating: $request->user()->id." },
+    { q: "What does old('title') do after a failed validation?", options: ["Loads an old post", "Refills the field with the user's previous input", "Deletes the input", "Nothing"], correct: 1, explain: "old() repopulates the field so the user need not retype it." },
+    { q: "Which directive shows a field's validation message?", options: ["@error('title')", "@invalid('title')", "@fails('title')", "@message('title')"], correct: 0, explain: "@error('title') ... @enderror displays that field's error message." },
+  ],
+  '5.7': [
+    { q: "Which command creates the Comment model with a migration?", options: ["make:model Comment", "make:model Comment -m", "make:comment", "make:migration Comment"], correct: 1, explain: "make:model Comment -m generates the model and its migration." },
+    { q: "A comment belongs to a post, so Comment has...", options: ["hasMany(Post::class)", "belongsTo(Post::class)", "hasOne(Post::class)", "belongsToMany(Post::class)"], correct: 1, explain: "The child side uses belongsTo(Post::class)." },
+    { q: "A post has many comments, so Post has...", options: ["belongsTo(Comment::class)", "hasMany(Comment::class)", "hasOne(Comment::class)", "morphTo()"], correct: 1, explain: "The parent side uses hasMany(Comment::class)." },
+    { q: "Which foreign key links comments to posts?", options: ["comment_id", "post_id", "user_id", "parent_id"], correct: 1, explain: "comments.post_id references posts.id." },
+    { q: "A good URL for posting a comment on post 5 is...", options: ["POST /comments", "POST /posts/5/comments", "GET /posts/5/comments", "PUT /comments/5"], correct: 1, explain: "Nest it under the post: POST /posts/{post}/comments." },
+  ],
+  '5.8': [
+    { q: "Which command runs the test suite?", options: ["php artisan test", "php artisan phpunit", "npm test", "php artisan check"], correct: 0, explain: "php artisan test runs PHPUnit/Pest with nicer output." },
+    { q: "What does the RefreshDatabase trait do?", options: ["Speeds up queries", "Gives each test a fresh migrated database, rolled back after", "Deletes production data", "Caches the schema"], correct: 1, explain: "It ensures each test runs against a clean database." },
+    { q: "How do you act as a logged-in user in a test?", options: ["$this->login($user)", "$this->actingAs($user)", "$this->auth($user)", "$user->login()"], correct: 1, explain: "$this->actingAs($user) authenticates the request for that test." },
+    { q: "Which assertion checks a row exists in a table?", options: ["assertSee", "assertDatabaseHas", "assertTrue", "assertRedirect"], correct: 1, explain: "assertDatabaseHas('posts', ['title' => 'Hello']) checks the row exists." },
+    { q: "Where do feature tests live by default?", options: ["app/Tests", "tests/Feature", "database/tests", "resources/tests"], correct: 1, explain: "Feature tests live in tests/Feature; unit tests in tests/Unit." },
+  ],
+  '5.9': [
+    { q: "In production, APP_DEBUG should be...", options: ["true", "false", "1", "removed"], correct: 1, explain: "APP_DEBUG=false in production so error details aren't exposed to users." },
+    { q: "What does php artisan key:generate do?", options: ["Creates an SSH key", "Sets APP_KEY, used for encryption", "Generates an API token", "Builds assets"], correct: 1, explain: "It sets APP_KEY, which Laravel uses to encrypt sessions and cookies." },
+    { q: "Which command builds front-end assets for production?", options: ["npm run dev", "npm run build", "php artisan build", "composer build"], correct: 1, explain: "npm run build produces optimized, versioned assets via Vite." },
+    { q: "Why run migrations with --force in production?", options: ["It runs faster", "To skip the interactive confirmation prompt", "To drop tables", "To seed data"], correct: 1, explain: "php artisan migrate --force runs without the confirmation prompt." },
+    { q: "What does php artisan config:cache improve?", options: ["Security only", "Boot performance — config compiled into one cached file", "Database size", "Asset size"], correct: 1, explain: "It caches merged config into a single file. Re-run after config changes." },
+  ],
 };
 
 // Attach each topic's questions to its lesson.
@@ -1526,5 +1972,65 @@ const EXERCISE_CHECKS = {
   '4.4': [
     { re: /@foreach\s*\(\s*\$posts\s+as\s+\$post\b/i, hint: 'The fix: @foreach ($posts as $post) — collection on the left, item on the right.' },
     { re: /\$post->title/i, hint: 'Print the singular item: {{ $post->title }}.' },
+  ],
+  '5.1': [
+    { re: /laravel new\s+blog|create-project\s+laravel\/laravel/i, hint: 'Create the app: laravel new blog' },
+    { re: /cd\s+blog/i, hint: 'Move into the project: cd blog' },
+    { re: /\bmigrate\b/i, hint: 'Run the migrations: php artisan migrate' },
+  ],
+  '5.2': [
+    { re: /composer require\s+laravel\/breeze/i, hint: 'Require Breeze: composer require laravel/breeze --dev' },
+    { re: /breeze:install/i, hint: 'Scaffold the auth views: php artisan breeze:install blade' },
+    { re: /npm (install|run build|run dev)/i, hint: 'Compile assets: npm install && npm run build' },
+    { re: /\bmigrate\b/i, hint: 'Run php artisan migrate' },
+  ],
+  '5.3': [
+    { re: /Schema::create\s*\(\s*['"]posts['"]/i, hint: "Use Schema::create('posts', ...)." },
+    { re: /foreignId\s*\(\s*['"]user_id['"]/i, hint: "Add a user_id foreign key: foreignId('user_id')." },
+    { re: /constrained\s*\(/i, hint: 'Chain ->constrained() to link user_id to the users table.' },
+    { re: /->string\s*\(\s*['"]title['"]/i, hint: "Add the title column: string('title')." },
+    { re: /->text\s*\(\s*['"]body['"]/i, hint: "Add the body column: text('body')." },
+    { re: /timestamps\s*\(/i, hint: 'Add $table->timestamps().' },
+    { re: /\$fillable/i, hint: 'Declare $fillable on the Post model (title, body, user_id).' },
+  ],
+  '5.4': [
+    { re: /function\s+index\s*\(/i, hint: 'Define the index() method.' },
+    { re: /Post::(latest|orderBy|all)/i, hint: 'Fetch the posts, e.g. Post::latest().' },
+    { re: /->get\s*\(|::all\s*\(/i, hint: 'Execute the query with ->get() (or use Post::all()).' },
+    { re: /view\s*\(\s*['"]posts\.index['"]/i, hint: "Return view('posts.index', ...)." },
+    { re: /['"]posts['"]\s*=>/i, hint: "Pass the collection as 'posts' => $posts." },
+  ],
+  '5.5': [
+    { re: /@foreach\s*\(\s*\$posts\s+as\s+\$post/i, hint: 'Loop with @foreach ($posts as $post).' },
+    { re: /route\s*\(\s*['"]posts\.show['"]/i, hint: "Link with route('posts.show', $post)." },
+    { re: /\$post->title/i, hint: 'Print the title: {{ $post->title }}.' },
+    { re: /@endforeach/i, hint: 'Close the loop with @endforeach.' },
+  ],
+  '5.6': [
+    { re: /function\s+store\s*\(/i, hint: 'Define store(Request $request).' },
+    { re: /->validate\s*\(/i, hint: 'Validate input with $request->validate([...]).' },
+    { re: /['"]title['"]\s*=>\s*['"][^'"]*required/i, hint: "title rule: 'required|max:255'." },
+    { re: /['"]body['"]\s*=>\s*['"][^'"]*required/i, hint: "body rule: 'required'." },
+    { re: /user\(\)->id|user_id/i, hint: 'Attach the author: $request->user()->id.' },
+    { re: /Post::create\s*\(/i, hint: 'Create the post with Post::create(...).' },
+    { re: /redirect\s*\(/i, hint: 'Redirect after saving.' },
+    { re: /posts\.index/i, hint: 'Redirect to the posts.index route.' },
+  ],
+  '5.7': [
+    { re: /function\s+post\s*\(/i, hint: 'On Comment, add a post() method.' },
+    { re: /belongsTo\s*\(\s*Post::class/i, hint: 'post() returns $this->belongsTo(Post::class).' },
+    { re: /function\s+comments\s*\(/i, hint: 'On Post, add a comments() method.' },
+    { re: /hasMany\s*\(\s*Comment::class/i, hint: 'comments() returns $this->hasMany(Comment::class).' },
+  ],
+  '5.8': [
+    { re: /actingAs\s*\(/i, hint: 'Authenticate in the test: $this->actingAs($user).' },
+    { re: /->post\s*\(\s*['"]\/posts['"]/i, hint: 'POST to /posts with the form data.' },
+    { re: /assertDatabaseHas\s*\(\s*['"]posts['"]/i, hint: "Assert the row exists: assertDatabaseHas('posts', ...)." },
+    { re: /['"]Hello['"]/i, hint: "Use the title 'Hello' so you can assert on it." },
+  ],
+  '5.9': [
+    { re: /key:generate/i, hint: 'Generate the app key: php artisan key:generate.' },
+    { re: /npm run build/i, hint: 'Build assets for production: npm run build.' },
+    { re: /migrate\s+--force/i, hint: 'Run migrations non-interactively: php artisan migrate --force.' },
   ],
 };
