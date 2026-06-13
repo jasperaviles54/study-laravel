@@ -1,9 +1,12 @@
 // Laravel Study Lab — application logic.
 
 const STORAGE_KEY = 'laravel-study-lab:progress';
+const SCORE_KEY = 'laravel-study-lab:scores';
+const QUIZ_SIZE = 5; // questions drawn per module quiz
 
 const state = {
   currentLessonId: null,
+  mode: 'lessons', // 'lessons' | 'quizzes'
   completed: new Set(loadProgress()),
 };
 
@@ -18,6 +21,29 @@ function loadProgress() {
 
 function saveProgress() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...state.completed]));
+}
+
+function loadScores() {
+  try {
+    const raw = localStorage.getItem(SCORE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveScores(scores) {
+  localStorage.setItem(SCORE_KEY, JSON.stringify(scores));
+}
+
+// Fisher-Yates shuffle — returns a new array, leaves the input untouched.
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 // Tiny PHP-ish syntax highlighter.
@@ -68,6 +94,13 @@ function codeBlock(rawCode) {
   return '<pre><code>' + highlightCode(rawCode) + '</code></pre>';
 }
 
+// Show exactly one of the top-level views.
+function showView(id) {
+  ['welcome', 'lessonView', 'quizView'].forEach(v => {
+    document.getElementById(v).classList.toggle('hidden', v !== id);
+  });
+}
+
 // Build the sidebar navigation.
 function renderSidebar() {
   const nav = document.getElementById('lessonNav');
@@ -83,7 +116,7 @@ function renderSidebar() {
       const a = document.createElement('div');
       a.className = 'lesson-link';
       if (state.completed.has(lesson.id)) a.classList.add('done');
-      if (state.currentLessonId === lesson.id) a.classList.add('active');
+      if (state.mode === 'lessons' && state.currentLessonId === lesson.id) a.classList.add('active');
       a.dataset.lessonId = lesson.id;
       a.innerHTML = `<span class="check"></span><span>${lesson.id} — ${lesson.title}</span>`;
       a.addEventListener('click', () => openLesson(lesson.id));
@@ -96,6 +129,11 @@ function renderSidebar() {
   const done = state.completed.size;
   const pct = total === 0 ? 0 : Math.round(100 * done / total);
   document.getElementById('progressSummary').textContent = `${done}/${total} lessons (${pct}%)`;
+
+  // Main nav (Lessons / Quizzes) active state
+  document.querySelectorAll('.main-nav .nav-item').forEach(it => {
+    it.classList.toggle('active', it.dataset.nav === state.mode);
+  });
 }
 
 function findLesson(id) {
@@ -110,9 +148,9 @@ function openLesson(id) {
   const lesson = findLesson(id);
   if (!lesson) return;
 
+  state.mode = 'lessons';
   state.currentLessonId = id;
-  document.getElementById('welcome').classList.add('hidden');
-  document.getElementById('lessonView').classList.remove('hidden');
+  showView('lessonView');
 
   document.getElementById('breadcrumb').textContent = lesson.moduleTitle;
   document.getElementById('lessonTitle').textContent = `${lesson.id} — ${lesson.title}`;
@@ -122,13 +160,13 @@ function openLesson(id) {
   document.getElementById('lessonExercise').innerHTML = lesson.exercise;
   document.getElementById('lessonSolution').innerHTML = codeBlock(lesson.solution);
 
-  // Reset solution visibility for each new lesson.
+  // Reset the exercise area for each new lesson: clear input, hide feedback + solution.
+  const feedback = document.getElementById('exerciseFeedback');
+  feedback.className = 'hidden';
+  feedback.innerHTML = '';
   document.getElementById('solutionBox').classList.add('hidden');
-  document.getElementById('showSolutionBtn').classList.remove('hidden');
-  document.getElementById('hideSolutionBtn').classList.add('hidden');
   document.getElementById('exerciseInput').value = '';
 
-  renderQuiz(lesson);
   renderMarkCompleteButton(lesson);
   renderNavButtons(lesson);
   renderSidebar();
@@ -136,45 +174,40 @@ function openLesson(id) {
   document.getElementById('content').scrollTop = 0;
 }
 
-function renderQuiz(lesson) {
-  const wrap = document.getElementById('lessonQuiz');
-  wrap.innerHTML = '';
+// Analyze the learner's exercise answer against the lesson's checkers, then
+// reveal the reference solution. Correct = every requirement matched.
+function checkAnswer() {
+  const lesson = findLesson(state.currentLessonId);
+  if (!lesson) return;
 
-  lesson.quiz.forEach((q, qi) => {
-    const qDiv = document.createElement('div');
-    qDiv.className = 'quiz-question';
+  const input = document.getElementById('exerciseInput').value.trim();
+  const feedback = document.getElementById('exerciseFeedback');
+  feedback.className = ''; // visible, neutral
 
-    const qText = document.createElement('p');
-    qText.className = 'q-text';
-    qText.textContent = `${qi + 1}. ${q.q}`;
-    qDiv.appendChild(qText);
+  if (!input) {
+    feedback.classList.add('feedback', 'bad');
+    feedback.innerHTML = '<p>Type your answer in the box above, then check.</p>';
+    return;
+  }
 
-    q.options.forEach((opt, oi) => {
-      const btn = document.createElement('div');
-      btn.className = 'quiz-option';
-      btn.textContent = opt;
-      btn.addEventListener('click', () => {
-        // Disable further clicks on this question
-        if (qDiv.dataset.answered) return;
-        qDiv.dataset.answered = '1';
+  const checks = EXERCISE_CHECKS[lesson.id] || [];
+  const misses = checks.filter(c => !c.re.test(input)).map(c => c.hint);
 
-        if (oi === q.correct) {
-          btn.classList.add('correct');
-        } else {
-          btn.classList.add('wrong');
-          // Reveal the right one
-          [...qDiv.querySelectorAll('.quiz-option')][q.correct].classList.add('correct');
-        }
-        const ex = document.createElement('div');
-        ex.className = 'quiz-explanation';
-        ex.textContent = q.explain;
-        qDiv.appendChild(ex);
-      });
-      qDiv.appendChild(btn);
-    });
+  if (checks.length === 0) {
+    feedback.classList.add('feedback', 'neutral');
+    feedback.innerHTML = '<p>This is an open-ended exercise — compare your answer with the reference solution below.</p>';
+  } else if (misses.length === 0) {
+    feedback.classList.add('feedback', 'ok');
+    feedback.innerHTML = '<p><strong>✓ Looks correct.</strong> Your answer covers the key parts of this problem. Compare it with the reference below to polish your style.</p>';
+  } else {
+    feedback.classList.add('feedback', 'bad');
+    feedback.innerHTML =
+      '<p><strong>Not quite yet — here\'s what to address:</strong></p><ul>' +
+      misses.map(m => `<li>${m}</li>`).join('') +
+      '</ul><p>Fix those, then compare with the reference solution below.</p>';
+  }
 
-    wrap.appendChild(qDiv);
-  });
+  document.getElementById('solutionBox').classList.remove('hidden');
 }
 
 function renderMarkCompleteButton(lesson) {
@@ -190,25 +223,164 @@ function renderMarkCompleteButton(lesson) {
 
 function renderNavButtons(lesson) {
   const idx = lessonIndex(lesson.id);
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-
-  prevBtn.disabled = idx <= 0;
-  nextBtn.disabled = idx >= ALL_LESSONS.length - 1;
+  document.getElementById('prevBtn').disabled = idx <= 0;
+  document.getElementById('nextBtn').disabled = idx >= ALL_LESSONS.length - 1;
 }
 
-// Event handlers
-document.getElementById('showSolutionBtn').addEventListener('click', () => {
-  document.getElementById('solutionBox').classList.remove('hidden');
-  document.getElementById('showSolutionBtn').classList.add('hidden');
-  document.getElementById('hideSolutionBtn').classList.remove('hidden');
-});
+/* ---------- Quizzes ---------- */
 
-document.getElementById('hideSolutionBtn').addEventListener('click', () => {
-  document.getElementById('solutionBox').classList.add('hidden');
-  document.getElementById('showSolutionBtn').classList.remove('hidden');
-  document.getElementById('hideSolutionBtn').classList.add('hidden');
-});
+function openQuizzes() {
+  state.mode = 'quizzes';
+  showView('quizView');
+  renderQuizHome();
+  renderSidebar();
+  document.getElementById('content').scrollTop = 0;
+}
+
+function renderQuizHome() {
+  const body = document.getElementById('quizBody');
+  const scores = loadScores();
+
+  let html = '<h2>Quizzes</h2>' +
+    `<p>Pick a topic below. Each quiz pulls up to <strong>${QUIZ_SIZE} questions</strong> from that lesson and shuffles both the question order and the answers, so every attempt is different.</p>`;
+
+  MODULES.forEach(m => {
+    html += `<h3 class="quiz-module-heading">${m.title}</h3><div class="quiz-modules">`;
+    m.lessons.forEach(l => {
+      const count = (l.quiz || []).length;
+      const take = Math.min(QUIZ_SIZE, count);
+      const best = scores[l.id];
+      const bestStr = best != null ? ` · best ${best}/${take}` : '';
+      html += '<div class="quiz-module-card">' +
+        `<div><h3>${l.id} — ${l.title}</h3><p class="muted">${count} questions${bestStr}</p></div>` +
+        `<button class="start-quiz" data-lesson="${l.id}">Start quiz</button>` +
+        '</div>';
+    });
+    html += '</div>';
+  });
+
+  body.innerHTML = html;
+
+  body.querySelectorAll('.start-quiz').forEach(b =>
+    b.addEventListener('click', () => startQuiz(b.dataset.lesson))
+  );
+}
+
+// Build a topic quiz: draw up to QUIZ_SIZE questions from this lesson's pool,
+// shuffle their order, and shuffle each question's answer options.
+function buildQuiz(lesson) {
+  const pool = lesson.quiz || [];
+  const picked = shuffle(pool).slice(0, Math.min(QUIZ_SIZE, pool.length));
+  return picked.map(q => ({
+    q: q.q,
+    explain: q.explain,
+    // Flag the correct option, THEN shuffle — no fragile index tracking.
+    options: shuffle(q.options.map((text, i) => ({ text, correct: i === q.correct }))),
+  }));
+}
+
+function startQuiz(lessonId) {
+  const lesson = findLesson(lessonId);
+  if (!lesson) return;
+  renderActiveQuiz(lesson, buildQuiz(lesson));
+  document.getElementById('content').scrollTop = 0;
+}
+
+function renderActiveQuiz(lesson, questions) {
+  const body = document.getElementById('quizBody');
+  body.innerHTML = '';
+
+  const back = document.createElement('button');
+  back.className = 'secondary quiz-back';
+  back.textContent = '← All quizzes';
+  back.addEventListener('click', renderQuizHome);
+  body.appendChild(back);
+
+  const heading = document.createElement('h2');
+  heading.textContent = `${lesson.id} — ${lesson.title}`;
+  body.appendChild(heading);
+
+  const status = document.createElement('div');
+  status.className = 'quiz-status';
+  body.appendChild(status);
+
+  let answered = 0;
+  let score = 0;
+
+  function updateStatus() {
+    status.textContent = `Answered ${answered}/${questions.length} · Score ${score}`;
+    if (answered === questions.length) {
+      const scores = loadScores();
+      if (scores[lesson.id] == null || score > scores[lesson.id]) {
+        scores[lesson.id] = score;
+        saveScores(scores);
+      }
+      const summary = document.createElement('div');
+      summary.className = 'quiz-summary';
+      summary.innerHTML = `<p><strong>Done! You scored ${score}/${questions.length}.</strong></p>`;
+      const retake = document.createElement('button');
+      retake.textContent = 'Retake (new shuffle)';
+      retake.addEventListener('click', () => startQuiz(lesson.id));
+      const home = document.createElement('button');
+      home.className = 'secondary';
+      home.textContent = '← All quizzes';
+      home.addEventListener('click', renderQuizHome);
+      summary.appendChild(retake);
+      summary.appendChild(home);
+      body.appendChild(summary);
+      summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  updateStatus();
+
+  questions.forEach((q, qi) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'quiz-question';
+
+    const qText = document.createElement('p');
+    qText.className = 'q-text';
+    qText.textContent = `${qi + 1}. ${q.q}`;
+    qDiv.appendChild(qText);
+
+    let correctBtn = null;
+    q.options.forEach(opt => {
+      const btn = document.createElement('div');
+      btn.className = 'quiz-option';
+      btn.textContent = opt.text;
+      if (opt.correct) correctBtn = btn;
+
+      btn.addEventListener('click', () => {
+        if (qDiv.dataset.answered) return;
+        qDiv.dataset.answered = '1';
+        answered++;
+
+        if (opt.correct) {
+          btn.classList.add('correct');
+          score++;
+        } else {
+          btn.classList.add('wrong');
+          if (correctBtn) correctBtn.classList.add('correct');
+        }
+
+        const ex = document.createElement('div');
+        ex.className = 'quiz-explanation';
+        ex.textContent = q.explain;
+        qDiv.appendChild(ex);
+
+        updateStatus();
+      });
+
+      qDiv.appendChild(btn);
+    });
+
+    body.appendChild(qDiv);
+  });
+}
+
+/* ---------- Event handlers ---------- */
+
+document.getElementById('checkAnswerBtn').addEventListener('click', checkAnswer);
 
 document.getElementById('markCompleteBtn').addEventListener('click', () => {
   const id = state.currentLessonId;
@@ -234,12 +406,22 @@ document.getElementById('nextBtn').addEventListener('click', () => {
 });
 
 document.getElementById('resetBtn').addEventListener('click', () => {
-  if (!confirm('Wipe all lesson progress?')) return;
+  if (!confirm('Wipe all lesson progress and quiz scores?')) return;
   state.completed = new Set();
   saveProgress();
+  saveScores({});
   renderSidebar();
-  if (state.currentLessonId) renderMarkCompleteButton(findLesson(state.currentLessonId));
+  if (state.mode === 'quizzes') renderQuizHome();
+  else if (state.currentLessonId) renderMarkCompleteButton(findLesson(state.currentLessonId));
 });
+
+document.querySelector('.main-nav [data-nav="lessons"]').addEventListener('click', () => {
+  state.mode = 'lessons';
+  showView(state.currentLessonId ? 'lessonView' : 'welcome');
+  renderSidebar();
+});
+
+document.querySelector('.main-nav [data-nav="quizzes"]').addEventListener('click', openQuizzes);
 
 // Initial render
 renderSidebar();

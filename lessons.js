@@ -33,20 +33,6 @@ echo "Hello, world!";  // 'echo' prints text to the output.
         exercise: `<p>Write a PHP file that outputs the text: <code>I am learning Laravel.</code></p>`,
         solution: `<?php
 echo "I am learning Laravel.";`,
-        quiz: [
-          {
-            q: 'Where does PHP code run?',
-            options: ['In the browser', 'On the server', 'In the database', 'On the user\'s phone'],
-            correct: 1,
-            explain: 'PHP runs server-side. The browser only sees the HTML output.'
-          },
-          {
-            q: 'Which tag opens a block of PHP code?',
-            options: ['<php>', '<?php', '<%php', '<script php>'],
-            correct: 1,
-            explain: 'PHP code starts with <?php and (optionally) ends with ?>.'
-          }
-        ]
       },
       {
         id: '1.2',
@@ -85,20 +71,6 @@ $author = "George Orwell";
 $year = 1949;
 
 echo "\\"$title\\" by $author was published in $year.";`,
-        quiz: [
-          {
-            q: 'Which is the correct way to declare a variable in PHP?',
-            options: ['var name = "Alex";', 'let $name = "Alex";', '$name = "Alex";', 'name := "Alex";'],
-            correct: 2,
-            explain: 'PHP variables start with $ and use a simple = assignment. No "var"/"let".'
-          },
-          {
-            q: 'What will echo \'Hello $name\' print, given $name = "Alex"?',
-            options: ['Hello Alex', 'Hello $name', 'Error', 'Nothing'],
-            correct: 1,
-            explain: 'Single quotes do not interpolate variables. The text is printed literally.'
-          }
-        ]
       },
       {
         id: '1.3',
@@ -144,20 +116,6 @@ $car = [
 ];
 
 echo $car["make"] . " " . $car["model"] . " (" . $car["year"] . ")";`,
-        quiz: [
-          {
-            q: 'How do you access the value with key "email" in an associative array $user?',
-            options: ['$user.email', '$user->email', '$user["email"]', '$user[email]'],
-            correct: 2,
-            explain: '$user["email"] — keys go in square brackets, strings in quotes. $user->email is object syntax, covered later.'
-          },
-          {
-            q: 'What does $fruits[] = "date" do?',
-            options: ['Replaces the array with "date"', 'Appends "date" to the end', 'Throws an error', 'Removes "date"'],
-            correct: 1,
-            explain: '[] with no key appends a new element to the end of an indexed array.'
-          }
-        ]
       },
       {
         id: '1.4',
@@ -212,25 +170,6 @@ foreach ($scores as $score) {
         echo "$score: FAIL\\n";
     }
 }`,
-        quiz: [
-          {
-            q: 'What is the difference between == and === ?',
-            options: [
-              'No difference',
-              '== compares values, === compares values AND types',
-              '=== is for arrays only',
-              '== is assignment, === is comparison'
-            ],
-            correct: 1,
-            explain: '== will type-juggle ("0" == 0 is true). === requires same type AND value. Use === to avoid surprises.'
-          },
-          {
-            q: 'Which loop is best for iterating over an array?',
-            options: ['for', 'while', 'foreach', 'do-while'],
-            correct: 2,
-            explain: 'foreach is designed for arrays. It handles indexed AND associative arrays cleanly.'
-          }
-        ]
       },
       {
         id: '1.5',
@@ -272,20 +211,6 @@ function isEven(int $n): bool {
 
 var_dump(isEven(4));  // bool(true)
 var_dump(isEven(7));  // bool(false)`,
-        quiz: [
-          {
-            q: 'What does the colon and type after the parentheses indicate? function foo(): string',
-            options: ['Parameter type', 'Return type', 'Variable name', 'Default value'],
-            correct: 1,
-            explain: 'The colon after the parentheses declares the return type of the function.'
-          },
-          {
-            q: 'Given function greet(string $name = "guest"), what does greet() return?',
-            options: ['null', 'an error', '"Hello, guest!"', 'empty string'],
-            correct: 2,
-            explain: 'When you omit an argument with a default value, PHP uses the default.'
-          }
-        ]
       },
       {
         id: '1.6',
@@ -352,20 +277,6 @@ class Book {
 
 $b = new Book("1984", "George Orwell");
 echo $b->describe();  // 1984 by George Orwell`,
-        quiz: [
-          {
-            q: 'What does $this refer to inside a class method?',
-            options: ['The class itself', 'The current object (instance)', 'The parent class', 'A random variable'],
-            correct: 1,
-            explain: '$this refers to the specific object the method was called on.'
-          },
-          {
-            q: 'A property marked private can be accessed where?',
-            options: ['Anywhere', 'Only inside the class that defines it', 'Inside the class and its subclasses', 'Only via getters'],
-            correct: 1,
-            explain: 'private = same class only. protected = same class + subclasses. public = anywhere.'
-          }
-        ]
       },
       {
         id: '1.7',
@@ -434,20 +345,6 @@ class Car extends Vehicle {
 
 $c = new Car();
 echo $c->move();  // driving on the road`,
-        quiz: [
-          {
-            q: 'Which keyword makes one class inherit from another?',
-            options: ['implements', 'extends', 'uses', 'inherits'],
-            correct: 1,
-            explain: 'extends. "implements" is for interfaces, "use" is for traits.'
-          },
-          {
-            q: 'How many interfaces can a class implement?',
-            options: ['One', 'Two', 'Unlimited', 'Zero'],
-            correct: 2,
-            explain: 'A class can implement as many interfaces as you want, separated by commas. But it can only extend one parent class.'
-          }
-        ]
       },
       {
         id: '1.8',
@@ -486,25 +383,6 @@ class UserController {
         exercise: `<p>Imagine you have a class at <code>app/Services/PaymentService.php</code> declared in namespace <code>App\\Services</code>. Write the <code>use</code> statement that imports it.</p>`,
         solution: `<?php
 use App\\Services\\PaymentService;`,
-        quiz: [
-          {
-            q: 'What does Composer do?',
-            options: [
-              'Compiles PHP into binary',
-              'Manages packages and autoloads classes',
-              'Runs database migrations',
-              'Renders HTML templates'
-            ],
-            correct: 1,
-            explain: 'Composer is PHP\'s package manager AND provides autoloading. Both jobs are critical to modern PHP.'
-          },
-          {
-            q: 'What separator does PHP use in namespaces?',
-            options: ['/ (forward slash)', '. (dot)', '\\ (backslash)', ':: (double colon)'],
-            correct: 2,
-            explain: 'PHP namespaces use backslash. App\\Models\\User. (Confusingly, in file paths you use forward slash, but in class names it\'s backslash.)'
-          }
-        ]
       }
     ]
   },
@@ -559,20 +437,6 @@ DELETE /products/42      → delete product 42
         solution: `1. GET /posts/5/comments
 2. POST /posts/5/comments
 3. DELETE /comments/17`,
-        quiz: [
-          {
-            q: 'Which HTTP method is used to fetch/read data without changing anything?',
-            options: ['POST', 'GET', 'PUT', 'DELETE'],
-            correct: 1,
-            explain: 'GET is for reading. It should be idempotent (safe to repeat) and never modify state.'
-          },
-          {
-            q: 'What does HTTP status 404 mean?',
-            options: ['Success', 'Validation failed', 'Not Found', 'Server error'],
-            correct: 2,
-            explain: '404 = the requested resource doesn\'t exist.'
-          }
-        ]
       },
       {
         id: '2.2',
@@ -619,25 +483,6 @@ class PostController {
         solution: `1. View
 2. Controller
 3. Model (data + behavior on data lives on the model)`,
-        quiz: [
-          {
-            q: 'In MVC, where does HTML live?',
-            options: ['Model', 'View', 'Controller', 'Route'],
-            correct: 1,
-            explain: 'Views are the HTML/presentation layer. In Laravel they\'re .blade.php files.'
-          },
-          {
-            q: 'A controller\'s primary job is to:',
-            options: [
-              'Define the database structure',
-              'Render HTML directly',
-              'Coordinate: take a request, get data, return a response',
-              'Style the page'
-            ],
-            correct: 2,
-            explain: 'Controllers orchestrate. They don\'t hold business logic (that goes on models) or HTML (that goes in views).'
-          }
-        ]
       },
       {
         id: '2.3',
@@ -677,25 +522,6 @@ JOIN users ON posts.user_id = users.id;`,
         solution: `INSERT INTO posts (title, user_id) VALUES ('Hello', 3);
 
 SELECT * FROM posts WHERE user_id = 3;`,
-        quiz: [
-          {
-            q: 'What does a foreign key do?',
-            options: [
-              'Encrypts a column',
-              'Links a row in one table to a row in another',
-              'Marks a column as required',
-              'Adds an index'
-            ],
-            correct: 1,
-            explain: 'A foreign key column references the primary key of another table, creating a relationship between rows.'
-          },
-          {
-            q: 'Which SQL command modifies existing rows?',
-            options: ['INSERT', 'SELECT', 'UPDATE', 'ALTER'],
-            correct: 2,
-            explain: 'UPDATE table SET col=val WHERE ... modifies existing rows. ALTER changes the schema, not the data.'
-          }
-        ]
       }
     ]
   },
@@ -747,20 +573,6 @@ php artisan tinker                     # interactive REPL`,
         solution: `a. php artisan make:controller OrderController
 b. php artisan make:model Order -m
 c. php artisan migrate`,
-        quiz: [
-          {
-            q: 'What is artisan?',
-            options: ['A web server', 'Laravel\'s command-line tool', 'The router', 'A package manager'],
-            correct: 1,
-            explain: 'Artisan is Laravel\'s CLI. You\'ll use it dozens of times a day.'
-          },
-          {
-            q: 'Where do you define routes?',
-            options: ['config/routes.php', 'app/routes/', 'routes/web.php', 'public/index.php'],
-            correct: 2,
-            explain: 'routes/web.php for browser routes, routes/api.php for API routes.'
-          }
-        ]
       },
       {
         id: '3.2',
@@ -800,20 +612,6 @@ Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show')
         solution: `Route::get('/greet/{name}', function ($name) {
     return "Hi, $name";
 });`,
-        quiz: [
-          {
-            q: 'How do you capture a URL parameter in a Laravel route?',
-            options: ['/:name', '/{name}', '/[name]', '/<name>'],
-            correct: 1,
-            explain: 'Curly braces: /users/{id}. Then the controller/closure receives $id as a parameter.'
-          },
-          {
-            q: 'Where do you typically register web routes?',
-            options: ['config/web.php', 'routes/web.php', 'app/Http/routes.php', 'public/routes.php'],
-            correct: 1,
-            explain: 'routes/web.php is the default home for browser-facing routes. routes/api.php for API routes.'
-          }
-        ]
       },
       {
         id: '3.3',
@@ -868,25 +666,6 @@ Route::resource('posts', PostController::class);`,
     $user = User::findOrFail($id);
     return view('users.show', ['user' => $user]);
 }`,
-        quiz: [
-          {
-            q: 'Which artisan command creates a resource controller with all 7 methods?',
-            options: [
-              'php artisan make:resource PostController',
-              'php artisan make:controller PostController --resource',
-              'php artisan controller:make PostController --all',
-              'php artisan resource PostController'
-            ],
-            correct: 1,
-            explain: '--resource flag scaffolds index/create/store/show/edit/update/destroy.'
-          },
-          {
-            q: 'In a resource controller, which method handles the form submission to create a new record?',
-            options: ['create()', 'store()', 'new()', 'index()'],
-            correct: 1,
-            explain: 'create() shows the form; store() handles the POST that actually creates the record.'
-          }
-        ]
       },
       {
         id: '3.4',
@@ -943,25 +722,6 @@ Route::resource('posts', PostController::class);`,
 @else
     Welcome, guest!
 @endif`,
-        quiz: [
-          {
-            q: 'What is the difference between {{ $value }} and {!! $value !!}?',
-            options: [
-              'No difference',
-              '{{ }} escapes HTML, {!! !!} prints raw',
-              '{{ }} is faster',
-              '{!! !!} is for variables, {{ }} for strings'
-            ],
-            correct: 1,
-            explain: '{{ }} escapes HTML to prevent XSS. {!! !!} prints unescaped — use it only when you trust the content.'
-          },
-          {
-            q: 'Which directive starts a loop over a collection?',
-            options: ['@for', '@loop', '@foreach', '@each'],
-            correct: 2,
-            explain: '@foreach ($items as $item) ... @endforeach — same as PHP\'s foreach.'
-          }
-        ]
       },
       {
         id: '3.5',
@@ -1014,30 +774,6 @@ return new class extends Migration {
         $table->timestamps();
     });
 }`,
-        quiz: [
-          {
-            q: 'Which command applies all pending migrations?',
-            options: [
-              'php artisan migrate',
-              'php artisan migrate:run',
-              'php artisan db:migrate',
-              'php artisan schema:apply'
-            ],
-            correct: 0,
-            explain: 'php artisan migrate. To undo, use migrate:rollback. To wipe + reapply, migrate:fresh.'
-          },
-          {
-            q: 'What does $table->timestamps() do?',
-            options: [
-              'Adds a created_at column only',
-              'Adds created_at AND updated_at columns',
-              'Adds a deleted_at column',
-              'Adds a timezone column'
-            ],
-            correct: 1,
-            explain: 'It adds the standard pair Laravel models expect. Eloquent maintains them automatically.'
-          }
-        ]
       },
       {
         id: '3.6',
@@ -1093,25 +829,6 @@ $post->delete();`,
         solution: `$posts = Post::where('is_published', true)
     ->orderBy('created_at', 'desc')
     ->get();`,
-        quiz: [
-          {
-            q: 'What table does a model called Order map to by default?',
-            options: ['Order', 'order', 'orders', 'Orders'],
-            correct: 2,
-            explain: 'Eloquent assumes plural snake_case: Order → orders. OrderItem → order_items.'
-          },
-          {
-            q: 'What\'s the difference between find() and findOrFail()?',
-            options: [
-              'No difference',
-              'find returns null if missing; findOrFail throws a 404',
-              'findOrFail is faster',
-              'find returns all rows'
-            ],
-            correct: 1,
-            explain: 'findOrFail is great in controllers — it auto-converts to a 404 response. find returns null, which you\'d have to check yourself.'
-          }
-        ]
       },
       {
         id: '3.7',
@@ -1168,25 +885,6 @@ public function post() {
 public function comments() {
     return $this->hasMany(Comment::class);
 }`,
-        quiz: [
-          {
-            q: 'Which relationship method is used on the "many" side of a one-to-many?',
-            options: ['hasMany', 'hasOne', 'belongsTo', 'manyToOne'],
-            correct: 2,
-            explain: 'belongsTo on the child (the "many" side). hasMany on the parent (the "one" side).'
-          },
-          {
-            q: 'Which line eager-loads related data to avoid the N+1 problem?',
-            options: [
-              'User::all()',
-              'User::with(\'posts\')->get()',
-              'User::find(1)->posts',
-              'User::eager()->all()'
-            ],
-            correct: 1,
-            explain: 'with() tells Eloquent to fetch the relationship in a separate single query, instead of one query per parent.'
-          }
-        ]
       },
       {
         id: '3.8',
@@ -1234,30 +932,6 @@ public function store(Request $request) {
     'password' => 'required|min:8',
     'age'      => 'nullable|integer|min:13|max:120',
 ]);`,
-        quiz: [
-          {
-            q: 'What does the @csrf directive do?',
-            options: [
-              'Validates form fields',
-              'Adds a hidden token to prevent cross-site request forgery',
-              'Encrypts the form',
-              'Adds rate limiting'
-            ],
-            correct: 1,
-            explain: 'CSRF = Cross-Site Request Forgery. The hidden token proves the request came from your site. Required on all non-GET forms.'
-          },
-          {
-            q: 'What does old(\'title\') do?',
-            options: [
-              'Loads the old version of the post',
-              'Fills in the field with the user\'s previous input after validation failure',
-              'Marks the field as deprecated',
-              'Nothing'
-            ],
-            correct: 1,
-            explain: 'After validation fails and Laravel redirects back, old(\'field\') retrieves what the user typed so they don\'t have to re-fill.'
-          }
-        ]
       },
       {
         id: '3.9',
@@ -1317,25 +991,6 @@ class PostController extends Controller {
     Route::get('/account', [AccountController::class, 'show']);
     Route::get('/account/edit', [AccountController::class, 'edit']);
 });`,
-        quiz: [
-          {
-            q: 'Which middleware do you apply to require a logged-in user?',
-            options: ['login', 'auth', 'guest', 'protected'],
-            correct: 1,
-            explain: 'The auth middleware. There\'s also guest (the opposite — only-if-not-logged-in, used on /login itself).'
-          },
-          {
-            q: 'How do you get the current logged-in user from a controller?',
-            options: [
-              '$user = User::current();',
-              '$user = $request->user(); or auth()->user();',
-              '$user = session(\'user\');',
-              '$user = $this->user;'
-            ],
-            correct: 1,
-            explain: 'Both forms work and are common. auth()->user() works anywhere; $request->user() is preferred when you already have the request.'
-          }
-        ]
       },
       {
         id: '3.10',
@@ -1400,30 +1055,6 @@ public function store(Request $request) {
         return $next($request);
     }
 }`,
-        quiz: [
-          {
-            q: 'What\'s special about flash session data?',
-            options: [
-              'It\'s encrypted',
-              'It only exists for the very next request, then disappears',
-              'It survives logout',
-              'It\'s stored in cookies'
-            ],
-            correct: 1,
-            explain: 'Flash data is "available next request only" — ideal for status/error messages after a redirect.'
-          },
-          {
-            q: 'A middleware\'s handle() method must do what to allow the request to continue?',
-            options: [
-              'Return true',
-              'Return $next($request)',
-              'Call $request->continue()',
-              'Return null'
-            ],
-            correct: 1,
-            explain: '$next($request) hands the request to the next middleware (and eventually the controller). Returning anything else short-circuits the pipeline.'
-          }
-        ]
       }
     ]
   },
@@ -1453,19 +1084,6 @@ Route::get('/hello/{name}', function () {
 Route::get('/hello/{name}', function ($name) {
     return "Hello, " . $name;
 });`,
-        quiz: [
-          {
-            q: 'When a route has a {param} placeholder, what must the handler do?',
-            options: [
-              'Nothing — Laravel populates a global',
-              'Accept a matching parameter',
-              'Call request()->route(\'param\')',
-              'Use session()->get(\'param\')'
-            ],
-            correct: 1,
-            explain: 'The closure or controller method must declare a parameter to receive it. Laravel matches by position/name.'
-          }
-        ]
       },
       {
         id: '4.2',
@@ -1490,19 +1108,6 @@ public function mine(Request $request) {
     $posts = Post::where('user_id', $request->user()->id)->get();
     return view('posts.mine', ['posts' => $posts]);
 }`,
-        quiz: [
-          {
-            q: 'Post::where(\'user_id\', 5) returns:',
-            options: [
-              'A collection of matching posts',
-              'A single post',
-              'A query builder — you still need to call ->get() (or similar)',
-              'A boolean'
-            ],
-            correct: 2,
-            explain: 'where() builds the query. You execute it with ->get(), ->first(), ->paginate(), ->count(), etc.'
-          }
-        ]
       },
       {
         id: '4.3',
@@ -1537,19 +1142,6 @@ class Post extends Model {
 
 // (Alternative: use ->forceCreate or use $post->title = ...; $post->save();
 //  but $fillable is the right answer.)`,
-        quiz: [
-          {
-            q: 'Why does Laravel require $fillable (or $guarded)?',
-            options: [
-              'Speed',
-              'To prevent a request from setting columns it shouldn\'t — like is_admin',
-              'To make queries shorter',
-              'Required for migrations to run'
-            ],
-            correct: 1,
-            explain: 'It protects against mass-assignment attacks: if you blindly create from $request->all(), a user could submit is_admin=1.'
-          }
-        ]
       },
       {
         id: '4.4',
@@ -1581,23 +1173,358 @@ class Post extends Model {
 
 // Read @foreach as: "for each item IN the collection AS a single thing".
 // Collection on the left, loop variable on the right.`,
-        quiz: [
-          {
-            q: 'In @foreach ($items as $item), which is the collection and which is each element?',
-            options: [
-              '$items is each element, $item is the collection',
-              '$items is the collection, $item is each element',
-              'Both refer to the same thing',
-              'Depends on the data type'
-            ],
-            correct: 1,
-            explain: 'Always: collection AS loop_variable. The thing being iterated is on the left.'
-          }
-        ]
       }
     ]
   }
 ];
 
+// All quiz questions, keyed by lesson id — the single source of truth. The loop
+// below attaches each set to its lesson as `lesson.quiz`; quizzes draw and
+// shuffle from here. Each question: { q, options, correct, explain }.
+const QUIZZES = {
+  '1.1': [
+    { q: "Where does PHP code run?", options: ["In the browser", "On the server", "In the database", "On the user's phone"], correct: 1, explain: "PHP runs server-side. The browser only sees the HTML output." },
+    { q: "Which tag opens a block of PHP code?", options: ["<php>", "<?php", "<%php", "<script php>"], correct: 1, explain: "PHP code starts with <?php and (optionally) ends with ?>." },
+    { q: "What does the PHP echo statement do?", options: ["Reads user input", "Outputs text to the response", "Defines a variable", "Connects to a database"], correct: 1, explain: "echo writes text to the output that becomes the HTML the browser receives." },
+    { q: "What file extension do PHP files use?", options: [".html", ".js", ".php", ".phtml"], correct: 2, explain: "PHP files end in .php. The server runs them and sends back the output." },
+    { q: "In modern Laravel code, a PHP file usually...", options: ["Mixes HTML and PHP heavily", "Contains only PHP and starts with <?php", "Always ends with ?>", "Has no opening tag"], correct: 1, explain: "Modern PHP/Laravel files are pure PHP, opening with <?php and omitting the closing ?>." },
+  ],
+  '1.2': [
+    { q: "Which is the correct way to declare a variable in PHP?", options: ["var name = \"Alex\";", "let $name = \"Alex\";", "$name = \"Alex\";", "name := \"Alex\";"], correct: 2, explain: "PHP variables start with $ and use a simple = assignment. No \"var\"/\"let\"." },
+    { q: "What will echo 'Hello $name' print, given $name = \"Alex\"?", options: ["Hello Alex", "Hello $name", "Error", "Nothing"], correct: 1, explain: "Single quotes do not interpolate variables. The text is printed literally." },
+    { q: "Which type would 3.14 be in PHP?", options: ["int", "float", "string", "bool"], correct: 1, explain: "Numbers with a decimal point are floats. Whole numbers are ints." },
+    { q: "What does the . operator do in PHP?", options: ["Accesses object properties", "Concatenates strings", "Divides numbers", "Ends a statement"], correct: 1, explain: "The dot (.) joins strings: \"Hello, \" . $name." },
+    { q: "Given $name = \"Alex\", what does \"Hi $name\" produce?", options: ["Hi $name", "Hi Alex", "An error", "Hi"], correct: 1, explain: "Double quotes interpolate variables, so $name is replaced with its value." },
+  ],
+  '1.3': [
+    { q: "How do you access the value with key \"email\" in an associative array $user?", options: ["$user.email", "$user->email", "$user[\"email\"]", "$user[email]"], correct: 2, explain: "$user[\"email\"] — keys go in square brackets, strings in quotes. $user->email is object syntax, covered later." },
+    { q: "What does $fruits[] = \"date\" do?", options: ["Replaces the array with \"date\"", "Appends \"date\" to the end", "Throws an error", "Removes \"date\""], correct: 1, explain: "[] with no key appends a new element to the end of an indexed array." },
+    { q: "Which creates an associative array?", options: ["[\"a\", \"b\", \"c\"]", "[\"name\" => \"Alex\"]", "array(1, 2, 3)", "[1, 2, 3]"], correct: 1, explain: "Associative arrays use key => value pairs. The others are indexed lists." },
+    { q: "How do you read the first element of an indexed array $fruits?", options: ["$fruits[1]", "$fruits[0]", "$fruits.first", "$fruits{0}"], correct: 1, explain: "Indexed arrays start at 0, so the first element is $fruits[0]." },
+    { q: "What is the modern syntax to create an array?", options: ["array()", "{ }", "[ ]", "new Array()"], correct: 2, explain: "Square brackets [ ] are the modern syntax. array(...) is the older equivalent." },
+  ],
+  '1.4': [
+    { q: "What is the difference between == and === ?", options: ["No difference", "== compares values, === compares values AND types", "=== is for arrays only", "== is assignment, === is comparison"], correct: 1, explain: "== will type-juggle (\"0\" == 0 is true). === requires same type AND value. Use === to avoid surprises." },
+    { q: "Which loop is best for iterating over an array?", options: ["for", "while", "foreach", "do-while"], correct: 2, explain: "foreach is designed for arrays. It handles indexed AND associative arrays cleanly." },
+    { q: "What does \"0\" == 0 evaluate to in PHP?", options: ["true", "false", "an error", "null"], correct: 0, explain: "== type-juggles, so \"0\" == 0 is true. Use === to require the same type." },
+    { q: "Which keyword runs a block only if the previous if/elseif were false?", options: ["elif", "else", "otherwise", "default"], correct: 1, explain: "else runs when no preceding if/elseif condition matched." },
+    { q: "A for loop is best when you...", options: ["Loop over an associative array", "Know how many times to repeat", "Never want to stop", "Only have one item"], correct: 1, explain: "for suits a known number of iterations; foreach is better for arrays." },
+  ],
+  '1.5': [
+    { q: "What does the colon and type after the parentheses indicate? function foo(): string", options: ["Parameter type", "Return type", "Variable name", "Default value"], correct: 1, explain: "The colon after the parentheses declares the return type of the function." },
+    { q: "Given function greet(string $name = \"guest\"), what does greet() return?", options: ["null", "an error", "\"Hello, guest!\"", "empty string"], correct: 2, explain: "When you omit an argument with a default value, PHP uses the default." },
+    { q: "In function multiply(int $a, int $b): int, what is the int before $a?", options: ["The return type", "A parameter type hint", "A variable", "A default value"], correct: 1, explain: "Type hints before a parameter constrain what can be passed in." },
+    { q: "What does ?string mean as a type?", options: ["Any type", "A string or null", "An optional array", "A secret string"], correct: 1, explain: "The leading ? makes the type nullable — string or null." },
+    { q: "How do you return a value from a function?", options: ["echo it", "Use the return keyword", "Assign it to $result", "Functions cannot return values"], correct: 1, explain: "return sends a value back to the caller and ends the function." },
+  ],
+  '1.6': [
+    { q: "What does $this refer to inside a class method?", options: ["The class itself", "The current object (instance)", "The parent class", "A random variable"], correct: 1, explain: "$this refers to the specific object the method was called on." },
+    { q: "A property marked private can be accessed where?", options: ["Anywhere", "Only inside the class that defines it", "Inside the class and its subclasses", "Only via getters"], correct: 1, explain: "private = same class only. protected = same class + subclasses. public = anywhere." },
+    { q: "Which method runs automatically when you create an object with new?", options: ["__init()", "__construct()", "start()", "create()"], correct: 1, explain: "__construct() is the constructor; it runs on instantiation." },
+    { q: "How do you create an instance of a class User?", options: ["User.new()", "new User()", "create User", "User()"], correct: 1, explain: "Use the new keyword: $u = new User(...)." },
+    { q: "What does public visibility mean?", options: ["Only the class can use it", "Accessible from anywhere", "Read-only", "Accessible to subclasses only"], correct: 1, explain: "public members are accessible anywhere. private = same class, protected = class + subclasses." },
+  ],
+  '1.7': [
+    { q: "Which keyword makes one class inherit from another?", options: ["implements", "extends", "uses", "inherits"], correct: 1, explain: "extends. \"implements\" is for interfaces, \"use\" is for traits." },
+    { q: "How many interfaces can a class implement?", options: ["One", "Two", "Unlimited", "Zero"], correct: 2, explain: "A class can implement as many interfaces as you want, separated by commas. But it can only extend one parent class." },
+    { q: "Which keyword applies a trait inside a class?", options: ["extends", "implements", "use", "include"], correct: 2, explain: "use MyTrait; mixes a trait into a class. extends is for parents, implements for interfaces." },
+    { q: "What does parent:: do?", options: ["Creates a new parent", "Calls a method on the parent class", "Deletes the parent", "Defines an interface"], correct: 1, explain: "parent:: calls the overridden method from the parent class." },
+    { q: "An interface contains...", options: ["Full method implementations", "Only method signatures (no bodies)", "Properties with values", "Private methods"], correct: 1, explain: "Interfaces declare method signatures a class must implement; they hold no code." },
+  ],
+  '1.8': [
+    { q: "What does Composer do?", options: ["Compiles PHP into binary", "Manages packages and autoloads classes", "Runs database migrations", "Renders HTML templates"], correct: 1, explain: "Composer is PHP's package manager AND provides autoloading. Both jobs are critical to modern PHP." },
+    { q: "What separator does PHP use in namespaces?", options: ["/ (forward slash)", ". (dot)", "\\ (backslash)", ":: (double colon)"], correct: 2, explain: "PHP namespaces use backslash. App\\Models\\User. (Confusingly, in file paths you use forward slash, but in class names it's backslash.)" },
+    { q: "What is the fully-qualified name of class User in namespace App\\Models?", options: ["App/Models/User", "App\\Models\\User", "Models::User", "User@App"], correct: 1, explain: "Namespaces use backslashes: App\\Models\\User." },
+    { q: "What does a use statement do at the top of a file?", options: ["Runs a function", "Imports a class so you can use its short name", "Installs a package", "Declares a variable"], correct: 1, explain: "use App\\Models\\User; lets you write User instead of the full path." },
+    { q: "After cloning a Laravel project, which command installs its dependencies?", options: ["composer install", "npm start", "php artisan serve", "composer update --all"], correct: 0, explain: "composer install reads composer.json/lock and installs packages into vendor/." },
+  ],
+  '2.1': [
+    { q: "Which HTTP method is used to fetch/read data without changing anything?", options: ["POST", "GET", "PUT", "DELETE"], correct: 1, explain: "GET is for reading. It should be idempotent (safe to repeat) and never modify state." },
+    { q: "What does HTTP status 404 mean?", options: ["Success", "Validation failed", "Not Found", "Server error"], correct: 2, explain: "404 = the requested resource doesn't exist." },
+    { q: "Which method is typically used to submit a form that creates a record?", options: ["GET", "POST", "HEAD", "OPTIONS"], correct: 1, explain: "POST sends a body to create/submit data. GET is for reading." },
+    { q: "What does status code 201 mean?", options: ["Not Found", "Created", "Redirect", "Unauthorized"], correct: 1, explain: "201 Created signals a resource was successfully created." },
+    { q: "What does 422 typically indicate in Laravel?", options: ["Server crashed", "Validation failed", "Page moved", "Success"], correct: 1, explain: "422 Unprocessable Entity is returned when validation fails." },
+  ],
+  '2.2': [
+    { q: "In MVC, where does HTML live?", options: ["Model", "View", "Controller", "Route"], correct: 1, explain: "Views are the HTML/presentation layer. In Laravel they're .blade.php files." },
+    { q: "A controller's primary job is to:", options: ["Define the database structure", "Render HTML directly", "Coordinate: take a request, get data, return a response", "Style the page"], correct: 2, explain: "Controllers orchestrate. They don't hold business logic (that goes on models) or HTML (that goes in views)." },
+    { q: "What does the M in MVC stand for?", options: ["Middleware", "Model", "Migration", "Module"], correct: 1, explain: "Model — represents data and business logic, usually mapped to a table." },
+    { q: "In Laravel, what file type are Views?", options: [".view.php", ".blade.php", ".html", ".tpl"], correct: 1, explain: "Laravel views are Blade templates ending in .blade.php." },
+    { q: "Business logic that operates on data belongs in the...", options: ["View", "Route", "Model", "CSS"], correct: 2, explain: "Models hold data and the behavior/logic that acts on it." },
+  ],
+  '2.3': [
+    { q: "What does a foreign key do?", options: ["Encrypts a column", "Links a row in one table to a row in another", "Marks a column as required", "Adds an index"], correct: 1, explain: "A foreign key column references the primary key of another table, creating a relationship between rows." },
+    { q: "Which SQL command modifies existing rows?", options: ["INSERT", "SELECT", "UPDATE", "ALTER"], correct: 2, explain: "UPDATE table SET col=val WHERE ... modifies existing rows. ALTER changes the schema, not the data." },
+    { q: "Which SQL statement reads rows?", options: ["SELECT", "GET", "READ", "FETCH"], correct: 0, explain: "SELECT reads/queries rows from a table." },
+    { q: "What does a JOIN do?", options: ["Deletes rows", "Combines rows from two tables on a related column", "Sorts results", "Adds a column"], correct: 1, explain: "JOIN merges rows across tables using a matching key, e.g. posts.user_id = users.id." },
+    { q: "Which clause filters which rows a query affects?", options: ["ORDER BY", "WHERE", "GROUP BY", "LIMIT"], correct: 1, explain: "WHERE restricts the rows selected, updated, or deleted." },
+  ],
+  '3.1': [
+    { q: "What is artisan?", options: ["A web server", "Laravel's command-line tool", "The router", "A package manager"], correct: 1, explain: "Artisan is Laravel's CLI. You'll use it dozens of times a day." },
+    { q: "Where do you define routes?", options: ["config/routes.php", "app/routes/", "routes/web.php", "public/index.php"], correct: 2, explain: "routes/web.php for browser routes, routes/api.php for API routes." },
+    { q: "What is the minimum PHP version for Laravel 13?", options: ["7.4", "8.0", "8.3", "8.1"], correct: 2, explain: "Laravel 13 requires PHP 8.3 or newer." },
+    { q: "Which folder holds Blade templates?", options: ["app/views", "resources/views", "public/views", "templates/"], correct: 1, explain: "Views live in resources/views as .blade.php files." },
+    { q: "What does php artisan serve do?", options: ["Deploys to production", "Starts a local development server", "Runs migrations", "Installs packages"], correct: 1, explain: "It launches a dev server, by default at http://127.0.0.1:8000." },
+  ],
+  '3.2': [
+    { q: "How do you capture a URL parameter in a Laravel route?", options: ["/:name", "/{name}", "/[name]", "/<name>"], correct: 1, explain: "Curly braces: /users/{id}. Then the controller/closure receives $id as a parameter." },
+    { q: "Where do you typically register web routes?", options: ["config/web.php", "routes/web.php", "app/Http/routes.php", "public/routes.php"], correct: 1, explain: "routes/web.php is the default home for browser-facing routes. routes/api.php for API routes." },
+    { q: "Which method registers a route that handles form submissions creating data?", options: ["Route::get", "Route::post", "Route::view", "Route::fetch"], correct: 1, explain: "Route::post() handles POST requests; Route::get() handles reads." },
+    { q: "What does ->name('dashboard') add to a route?", options: ["A middleware", "A named reference usable via route('dashboard')", "A URL prefix", "A controller"], correct: 1, explain: "Named routes let you generate URLs with route('dashboard') instead of hard-coding paths." },
+    { q: "How do you point a route at a controller method?", options: ["[PostController::class, 'index']", "PostController->index", "use PostController", "controller('index')"], correct: 0, explain: "Pass [Controller::class, 'method'] as the route action." },
+  ],
+  '3.3': [
+    { q: "Which artisan command creates a resource controller with all 7 methods?", options: ["php artisan make:resource PostController", "php artisan make:controller PostController --resource", "php artisan controller:make PostController --all", "php artisan resource PostController"], correct: 1, explain: "--resource flag scaffolds index/create/store/show/edit/update/destroy." },
+    { q: "In a resource controller, which method handles the form submission to create a new record?", options: ["create()", "store()", "new()", "index()"], correct: 1, explain: "create() shows the form; store() handles the POST that actually creates the record." },
+    { q: "What problem do controllers solve?", options: ["Styling pages", "Grouping related request-handling logic out of route closures", "Running migrations", "Defining the schema"], correct: 1, explain: "Controllers organize handlers into classes instead of bloating routes/web.php." },
+    { q: "In a resource controller, which method shows a single record?", options: ["index()", "show($id)", "store()", "create()"], correct: 1, explain: "show($id) displays one record; index() lists all." },
+    { q: "Route::resource('posts', PostController::class) creates how many routes?", options: ["1", "3", "7", "10"], correct: 2, explain: "It wires the 7 standard resource routes (index, create, store, show, edit, update, destroy)." },
+  ],
+  '3.4': [
+    { q: "What is the difference between {{ $value }} and {!! $value !!}?", options: ["No difference", "{{ }} escapes HTML, {!! !!} prints raw", "{{ }} is faster", "{!! !!} is for variables, {{ }} for strings"], correct: 1, explain: "{{ }} escapes HTML to prevent XSS. {!! !!} prints unescaped — use it only when you trust the content." },
+    { q: "Which directive starts a loop over a collection?", options: ["@for", "@loop", "@foreach", "@each"], correct: 2, explain: "@foreach ($items as $item) ... @endforeach — same as PHP's foreach." },
+    { q: "Which Blade echo auto-escapes HTML to prevent XSS?", options: ["{!! $x !!}", "{{ $x }}", "<?= $x ?>", "@{{ $x }}"], correct: 1, explain: "{{ $x }} escapes output. {!! !!} prints raw HTML — use only on trusted content." },
+    { q: "Which directive includes another view?", options: ["@import", "@include", "@require", "@view"], correct: 1, explain: "@include('partial') renders another Blade view inline." },
+    { q: "In a layout, what marks where child content is injected?", options: ["@section", "@yield", "@extends", "@slot"], correct: 1, explain: "@yield('content') in the layout is filled by the child's @section('content')." },
+  ],
+  '3.5': [
+    { q: "Which command applies all pending migrations?", options: ["php artisan migrate", "php artisan migrate:run", "php artisan db:migrate", "php artisan schema:apply"], correct: 0, explain: "php artisan migrate. To undo, use migrate:rollback. To wipe + reapply, migrate:fresh." },
+    { q: "What does $table->timestamps() do?", options: ["Adds a created_at column only", "Adds created_at AND updated_at columns", "Adds a deleted_at column", "Adds a timezone column"], correct: 1, explain: "It adds the standard pair Laravel models expect. Eloquent maintains them automatically." },
+    { q: "Which method adds an auto-incrementing primary key?", options: ["$table->key()", "$table->id()", "$table->primary()", "$table->auto()"], correct: 1, explain: "$table->id() creates the bigint auto-increment primary key." },
+    { q: "What does the down() method in a migration do?", options: ["Applies the change", "Reverses the change", "Seeds data", "Runs tests"], correct: 1, explain: "down() undoes what up() did, enabling rollbacks." },
+    { q: "Which adds a foreign key referencing users.id?", options: ["$table->foreignId('user_id')->constrained()", "$table->integer('user_id')", "$table->foreign('user_id')", "$table->reference('users')"], correct: 0, explain: "foreignId('user_id')->constrained() infers the users table and adds the constraint." },
+  ],
+  '3.6': [
+    { q: "What table does a model called Order map to by default?", options: ["Order", "order", "orders", "Orders"], correct: 2, explain: "Eloquent assumes plural snake_case: Order → orders. OrderItem → order_items." },
+    { q: "What's the difference between find() and findOrFail()?", options: ["No difference", "find returns null if missing; findOrFail throws a 404", "findOrFail is faster", "find returns all rows"], correct: 1, explain: "findOrFail is great in controllers — it auto-converts to a 404 response. find returns null, which you'd have to check yourself." },
+    { q: "What does Post::all() return?", options: ["One post", "A collection of all posts", "A query builder", "A boolean"], correct: 1, explain: "all() executes immediately and returns a collection of every row." },
+    { q: "Why is $fillable needed for Post::create([...])?", options: ["Speed", "To whitelist mass-assignable columns", "For migrations", "To define relationships"], correct: 1, explain: "Mass-assignment protection: only $fillable fields can be set via create()/update() arrays." },
+    { q: "Which executes a where() query and returns the matching rows?", options: ["->run()", "->get()", "->all()", "->fetch()"], correct: 1, explain: "->get() runs the built query and returns a collection. ->first() returns one." },
+  ],
+  '3.7': [
+    { q: "Which relationship method is used on the \"many\" side of a one-to-many?", options: ["hasMany", "hasOne", "belongsTo", "manyToOne"], correct: 2, explain: "belongsTo on the child (the \"many\" side). hasMany on the parent (the \"one\" side)." },
+    { q: "Which line eager-loads related data to avoid the N+1 problem?", options: ["User::all()", "User::with('posts')->get()", "User::find(1)->posts", "User::eager()->all()"], correct: 1, explain: "with() tells Eloquent to fetch the relationship in a separate single query, instead of one query per parent." },
+    { q: "Which relationship is declared on the \"one\" side of one-to-many?", options: ["belongsTo", "hasMany", "belongsToMany", "hasManyThrough"], correct: 1, explain: "The parent uses hasMany(); the child uses belongsTo()." },
+    { q: "What is the N+1 query problem?", options: ["Too many tables", "One extra query per parent when accessing a relation in a loop", "A migration error", "A syntax error"], correct: 1, explain: "Lazily loading a relation in a loop fires a query per parent. Eager loading with with() fixes it." },
+    { q: "Which method sets up a many-to-many relationship?", options: ["hasMany", "belongsToMany", "hasOne", "morphMany"], correct: 1, explain: "belongsToMany() models many-to-many via a pivot table." },
+  ],
+  '3.8': [
+    { q: "What does the @csrf directive do?", options: ["Validates form fields", "Adds a hidden token to prevent cross-site request forgery", "Encrypts the form", "Adds rate limiting"], correct: 1, explain: "CSRF = Cross-Site Request Forgery. The hidden token proves the request came from your site. Required on all non-GET forms." },
+    { q: "What does old('title') do?", options: ["Loads the old version of the post", "Fills in the field with the user's previous input after validation failure", "Marks the field as deprecated", "Nothing"], correct: 1, explain: "After validation fails and Laravel redirects back, old('field') retrieves what the user typed so they don't have to re-fill." },
+    { q: "Where do you usually run $request->validate([...])?", options: ["In the view", "In the controller", "In the migration", "In routes/web.php"], correct: 1, explain: "Validation runs in the controller (or a Form Request) before using the data." },
+    { q: "What happens when validation fails?", options: ["The app crashes", "Laravel redirects back with errors and old input", "Data is saved anyway", "The user is logged out"], correct: 1, explain: "On failure Laravel redirects back, flashing errors and old() input automatically." },
+    { q: "Which directive displays the error message for a field?", options: ["@error('title')", "@invalid('title')", "@fails('title')", "@message('title')"], correct: 0, explain: "@error('title') ... @enderror shows the validation message for that field." },
+  ],
+  '3.9': [
+    { q: "Which middleware do you apply to require a logged-in user?", options: ["login", "auth", "guest", "protected"], correct: 1, explain: "The auth middleware. There's also guest (the opposite — only-if-not-logged-in, used on /login itself)." },
+    { q: "How do you get the current logged-in user from a controller?", options: ["$user = User::current();", "$user = $request->user(); or auth()->user();", "$user = session('user');", "$user = $this->user;"], correct: 1, explain: "Both forms work and are common. auth()->user() works anywhere; $request->user() is preferred when you already have the request." },
+    { q: "Which middleware requires a user to be logged in?", options: ["guest", "auth", "verified", "signed"], correct: 1, explain: "The auth middleware blocks guests. guest is the opposite (only when logged out)." },
+    { q: "What is Laravel Breeze?", options: ["A database", "A minimal authentication starter kit", "A templating engine", "A queue driver"], correct: 1, explain: "Breeze scaffolds login, registration, password reset, and email verification." },
+    { q: "Which Blade directive shows content only to logged-in users?", options: ["@guest", "@auth", "@can", "@if(user)"], correct: 1, explain: "@auth ... @endauth renders only when a user is authenticated." },
+  ],
+  '3.10': [
+    { q: "What's special about flash session data?", options: ["It's encrypted", "It only exists for the very next request, then disappears", "It survives logout", "It's stored in cookies"], correct: 1, explain: "Flash data is \"available next request only\" — ideal for status/error messages after a redirect." },
+    { q: "A middleware's handle() method must do what to allow the request to continue?", options: ["Return true", "Return $next($request)", "Call $request->continue()", "Return null"], correct: 1, explain: "$next($request) hands the request to the next middleware (and eventually the controller). Returning anything else short-circuits the pipeline." },
+    { q: "Where are custom middleware aliases registered in Laravel 11–13?", options: ["app/Http/Kernel.php", "bootstrap/app.php", "config/middleware.php", "routes/web.php"], correct: 1, explain: "Since Laravel 11, middleware aliases are configured in bootstrap/app.php via withMiddleware()." },
+    { q: "What does session()->forget('cart_count') do?", options: ["Reads the value", "Removes the value from the session", "Flashes it", "Encrypts it"], correct: 1, explain: "forget() deletes a key from the session." },
+    { q: "How do you flash a one-request status message after a redirect?", options: ["redirect()->with('status', '...')", "session()->keep()", "return view('status')", "echo 'status'"], correct: 0, explain: "redirect()->with('status', '...') flashes data available on the very next request only." },
+  ],
+  '4.1': [
+    { q: "When a route has a {param} placeholder, what must the handler do?", options: ["Nothing — Laravel populates a global", "Accept a matching parameter", "Call request()->route('param')", "Use session()->get('param')"], correct: 1, explain: "The closure or controller method must declare a parameter to receive it. Laravel matches by position/name." },
+    { q: "How does Laravel decide which value to pass into function ($name)?", options: ["Alphabetically", "By matching the {name} segment in the route URI", "From the query string only", "It always passes the full Request"], correct: 1, explain: "Route parameters are injected by name/position from the URI pattern — {name} fills the $name argument." },
+    { q: "A route /hello/{name} with closure function () { return $name; } fails because...", options: ["The route is misspelled", "$name is undefined — the closure didn't declare it", "You need a controller", "GET is not allowed"], correct: 1, explain: "The closure must declare the parameter: function ($name)." },
+    { q: "What does the {name} part of a route URI represent?", options: ["A query string key", "A route parameter captured from the URL", "A view name", "A middleware"], correct: 1, explain: "{name} is a route parameter; its value comes from that URL segment." },
+    { q: "How do you make a route parameter optional?", options: ["{name?}", "{name|null}", "{?name}", "{name=}"], correct: 0, explain: "A trailing ? makes it optional: /hello/{name?} — give the argument a default too." },
+  ],
+  '4.2': [
+    { q: "Post::where('user_id', 5) returns:", options: ["A collection of matching posts", "A single post", "A query builder — you still need to call ->get() (or similar)", "A boolean"], correct: 2, explain: "where() builds the query. You execute it with ->get(), ->first(), ->paginate(), ->count(), etc." },
+    { q: "Which of these does NOT execute the query (it only builds it)?", options: ["->get()", "->first()", "->orderBy()", "->paginate()"], correct: 2, explain: "->orderBy() (like ->where(), ->select()) only adds to the query. ->get()/->first()/->paginate() run it." },
+    { q: "Calling Post::where('user_id', 5) without ->get() returns...", options: ["A collection", "A query builder", "An array", "null"], correct: 1, explain: "where() returns a builder; you must execute it with ->get(), ->first(), etc." },
+    { q: "After fixing the bug, which line correctly runs the filter?", options: ["Post::where('user_id', $id)", "Post::where('user_id', $id)->get()", "Post::find()->where()", "Post::all('user_id')"], correct: 1, explain: "Append ->get() (or ->first()/->paginate()) to execute the where() filter." },
+    { q: "To paginate results instead of fetching all rows, use...", options: ["->page()", "->paginate(15)", "->limit()", "->chunk()"], correct: 1, explain: "->paginate(15) executes the query and returns a paginator of 15 per page." },
+  ],
+  '4.3': [
+    { q: "Why does Laravel require $fillable (or $guarded)?", options: ["Speed", "To prevent a request from setting columns it shouldn't — like is_admin", "To make queries shorter", "Required for migrations to run"], correct: 1, explain: "It protects against mass-assignment attacks: if you blindly create from $request->all(), a user could submit is_admin=1." },
+    { q: "Which property is the inverse of $fillable (lists what may NOT be mass-assigned)?", options: ["$hidden", "$guarded", "$casts", "$visible"], correct: 1, explain: "$guarded blacklists attributes; $fillable whitelists them. Use one or the other, not both." },
+    { q: "A MassAssignmentException means...", options: ["Too many columns", "You tried to mass-assign a field not in $fillable", "The table is missing", "A syntax error"], correct: 1, explain: "Eloquent blocks create()/update() of attributes not whitelisted in $fillable." },
+    { q: "Which is the safest fix for the broken store() method?", options: ["Use $request->all() directly", "Add protected $fillable on the model", "Disable CSRF", "Delete the validation"], correct: 1, explain: "Declaring $fillable lets the validated fields be mass-assigned safely." },
+    { q: "What attack does mass-assignment protection prevent?", options: ["SQL injection", "A user setting columns like is_admin via extra form fields", "XSS", "Clickjacking"], correct: 1, explain: "Without it, a crafted request could set sensitive columns such as is_admin." },
+  ],
+  '4.4': [
+    { q: "In @foreach ($items as $item), which is the collection and which is each element?", options: ["$items is each element, $item is the collection", "$items is the collection, $item is each element", "Both refer to the same thing", "Depends on the data type"], correct: 1, explain: "Always: collection AS loop_variable. The thing being iterated is on the left." },
+    { q: "Which directive correctly closes an @foreach loop in Blade?", options: ["@end", "@endfor", "@endforeach", "@stop"], correct: 2, explain: "@foreach is paired with @endforeach. @endfor closes @for; @stop closes @section." },
+    { q: "The error \"array offset on value of type null\" in @foreach ($post as $posts) means...", options: ["The DB is down", "The collection and item variables are swapped", "Blade is disabled", "The view is missing"], correct: 1, explain: "The controller passes $posts (the collection); the loop wrongly iterates $post." },
+    { q: "What is the correct foreach syntax in Blade?", options: ["@foreach ($post as $posts)", "@foreach ($posts as $post)", "@for ($posts as $post)", "@each ($posts, $post)"], correct: 1, explain: "Collection on the left, single item on the right: @foreach ($posts as $post)." },
+    { q: "Inside the loop, how do you print each post's title?", options: ["{{ $posts->title }}", "{{ $post->title }}", "{{ post.title }}", "{{ $post[title] }}"], correct: 1, explain: "Use the singular loop variable: {{ $post->title }}." },
+  ],
+};
+
+// Attach each topic's questions to its lesson.
+MODULES.forEach(m => m.lessons.forEach(l => {
+  l.quiz = QUIZZES[l.id] || [];
+}));;
+
 // Flatten lessons in order so we can navigate prev/next easily.
 const ALL_LESSONS = MODULES.flatMap(m => m.lessons.map(l => ({ ...l, moduleTitle: m.title })));
+
+// Exercise answer checkers, keyed by lesson id.
+// Each requirement is { re: RegExp, hint: string }. An answer counts as correct
+// when EVERY requirement's regex matches the user's input. These check that the
+// answer addresses the problem (key constructs/values) rather than matching the
+// reference solution character-for-character — many valid styles pass. When a
+// requirement fails, its `hint` tells the learner what to fix and why.
+const EXERCISE_CHECKS = {
+  '1.1': [
+    { re: /\b(echo|print)\b/i, hint: 'Use echo (or print) to output text.' },
+    { re: /I am learning Laravel/i, hint: 'Output the exact text: I am learning Laravel.' },
+  ],
+  '1.2': [
+    { re: /\$title\s*=/i, hint: 'Create a $title variable.' },
+    { re: /\$author\s*=/i, hint: 'Create an $author variable.' },
+    { re: /\$year\s*=/i, hint: 'Create a $year variable.' },
+    { re: /\becho\b/i, hint: 'Use echo to print the sentence.' },
+  ],
+  '1.3': [
+    { re: /\$car\s*=\s*\[/i, hint: 'Create $car as an array using [ ].' },
+    { re: /['"]make['"]\s*=>/i, hint: 'Add a "make" key.' },
+    { re: /['"]model['"]\s*=>/i, hint: 'Add a "model" key.' },
+    { re: /['"]year['"]\s*=>/i, hint: 'Add a "year" key.' },
+    { re: /\becho\b/i, hint: 'Echo the formatted string.' },
+    { re: /\(/, hint: 'Wrap the year in parentheses, e.g. (2022).' },
+  ],
+  '1.4': [
+    { re: /foreach\s*\(/i, hint: 'Loop over $scores with foreach.' },
+    { re: /\bif\b/i, hint: 'Use an if to test each score.' },
+    { re: />=\s*60|60\s*<=|>\s*59/i, hint: 'A pass is 60 or above (score >= 60).' },
+    { re: /PASS/, hint: 'Echo "PASS" for passing scores.' },
+    { re: /FAIL/, hint: 'Echo "FAIL" for failing scores.' },
+  ],
+  '1.5': [
+    { re: /function\s+isEven/i, hint: 'Define a function named isEven.' },
+    { re: /%\s*2/, hint: 'Use the modulo operator (% 2) to test evenness.' },
+    { re: /(===|==)\s*0/, hint: 'Check that the remainder equals 0.' },
+    { re: /\breturn\b/i, hint: 'Return the boolean result.' },
+    { re: /isEven\s*\(\s*4\s*\)/i, hint: 'Call isEven(4).' },
+    { re: /isEven\s*\(\s*7\s*\)/i, hint: 'Call isEven(7).' },
+  ],
+  '1.6': [
+    { re: /class\s+Book/i, hint: 'Declare a class named Book.' },
+    { re: /function\s+__construct/i, hint: 'Add a __construct() that sets the properties.' },
+    { re: /function\s+describe/i, hint: 'Add a describe() method.' },
+    { re: /\$this->/, hint: 'Use $this-> to read the properties inside describe().' },
+    { re: /new\s+Book/i, hint: 'Create an instance with new Book(...).' },
+    { re: /->describe\s*\(/i, hint: 'Call ->describe() and echo the result.' },
+  ],
+  '1.7': [
+    { re: /class\s+Vehicle/i, hint: 'Declare a Vehicle class.' },
+    { re: /function\s+move/i, hint: 'Give Vehicle a move() method.' },
+    { re: /class\s+Car\s+extends\s+Vehicle/i, hint: 'Car must extend Vehicle: class Car extends Vehicle.' },
+    { re: /driving on the road/i, hint: 'Car::move() should return "driving on the road".' },
+    { re: /new\s+Car/i, hint: 'Create a Car instance and call ->move().' },
+  ],
+  '1.8': [
+    { re: /use\s+App\\Services\\PaymentService/i, hint: 'Import it with: use App\\Services\\PaymentService;' },
+  ],
+  '2.1': [
+    { re: /GET\s+\/posts\/5\/comments/i, hint: 'View all comments: GET /posts/5/comments' },
+    { re: /POST\s+\/posts\/5\/comments/i, hint: 'Create a comment: POST /posts/5/comments' },
+    { re: /DELETE\s+\/comments\/17/i, hint: 'Delete a comment: DELETE /comments/17' },
+  ],
+  '2.2': [
+    { re: /1[\s.):\-]*view/i, hint: 'Item 1 (HTML for a profile page) is a View.' },
+    { re: /2[\s.):\-]*controller/i, hint: 'Item 2 (fetch a user by ID, pass to a page) is a Controller.' },
+    { re: /3[\s.):\-]*model/i, hint: 'Item 3 (fullName combining fields) belongs on the Model.' },
+  ],
+  '2.3': [
+    { re: /insert\s+into\s+posts/i, hint: 'Use INSERT INTO posts ... to add the row.' },
+    { re: /['"]hello['"]/i, hint: "Insert the title 'Hello'." },
+    { re: /select[\s\S]*from\s+posts/i, hint: 'Use SELECT ... FROM posts to read rows.' },
+    { re: /where[\s\S]*user_id\s*=\s*3/i, hint: 'Filter the select with WHERE user_id = 3.' },
+  ],
+  '3.1': [
+    { re: /make:controller\s+OrderController/i, hint: '(a) php artisan make:controller OrderController' },
+    { re: /make:model\s+Order\s+-m/i, hint: '(b) php artisan make:model Order -m (the -m also makes the migration).' },
+    { re: /\bmigrate\b/i, hint: '(c) php artisan migrate' },
+  ],
+  '3.2': [
+    { re: /\/greet\/\{name\}/i, hint: "Match the path: '/greet/{name}'." },
+    { re: /function\s*\(\s*\$name/i, hint: 'The closure must accept the parameter: function ($name).' },
+    { re: /\breturn\b/i, hint: 'Return the greeting.' },
+    { re: /hi/i, hint: 'The response should say "Hi, ...".' },
+    { re: /\$name/, hint: 'Include the $name value in the response.' },
+  ],
+  '3.3': [
+    { re: /function\s+show\s*\(\s*\$id/i, hint: 'Define show($id).' },
+    { re: /User::findOrFail\s*\(\s*\$id/i, hint: 'Use User::findOrFail($id) to load the user.' },
+    { re: /view\s*\(\s*['"]users\.show['"]/i, hint: "Return view('users.show', ...)." },
+    { re: /['"]user['"]\s*=>/i, hint: "Pass the user as 'user' => $user." },
+  ],
+  '3.4': [
+    { re: /@if\s*\(\s*\$user/i, hint: 'Use @if ($user) to test whether the user is set.' },
+    { re: /@else/i, hint: 'Add an @else branch for the guest case.' },
+    { re: /@endif/i, hint: 'Close the conditional with @endif.' },
+    { re: /welcome/i, hint: 'Print a "Welcome, ..." message.' },
+    { re: /guest/i, hint: 'The fallback should say "Welcome, guest!".' },
+    { re: /\$user->name|\{\{\s*\$user/i, hint: "Show the name with {{ $user->name }}." },
+  ],
+  '3.5': [
+    { re: /Schema::create\s*\(\s*['"]comments['"]/i, hint: "Use Schema::create('comments', ...)." },
+    { re: /->id\s*\(/i, hint: 'Add $table->id().' },
+    { re: /foreignId\s*\(\s*['"]post_id['"]/i, hint: "Add $table->foreignId('post_id')." },
+    { re: /constrained\s*\(/i, hint: 'Chain ->constrained() to link post_id to the posts table.' },
+    { re: /->text\s*\(\s*['"]body['"]/i, hint: "Add $table->text('body')." },
+    { re: /timestamps\s*\(/i, hint: 'Add $table->timestamps().' },
+  ],
+  '3.6': [
+    { re: /Post::where\s*\(\s*['"]is_published['"]\s*,\s*(true|1)/i, hint: "Filter with Post::where('is_published', true)." },
+    { re: /orderBy\s*\(\s*['"]created_at['"]\s*,\s*['"]desc['"]/i, hint: "Order with ->orderBy('created_at', 'desc')." },
+    { re: /->get\s*\(/i, hint: 'Execute the query with ->get().' },
+  ],
+  '3.7': [
+    { re: /function\s+post\s*\(/i, hint: 'On Comment, add a post() method.' },
+    { re: /belongsTo\s*\(\s*Post::class/i, hint: 'post() should return $this->belongsTo(Post::class).' },
+    { re: /function\s+comments\s*\(/i, hint: 'On Post, add a comments() method.' },
+    { re: /hasMany\s*\(\s*Comment::class/i, hint: 'comments() should return $this->hasMany(Comment::class).' },
+  ],
+  '3.8': [
+    { re: /=>\s*['"][^'"]*email/i, hint: "email needs the email rule, e.g. 'required|email'." },
+    { re: /required/i, hint: 'Mark email and password as required.' },
+    { re: /min:8/i, hint: "password needs 'required|min:8'." },
+    { re: /nullable/i, hint: 'age is optional, so use nullable.' },
+    { re: /integer/i, hint: 'age should be an integer.' },
+    { re: /min:13/i, hint: 'age minimum is 13 (min:13).' },
+    { re: /max:120/i, hint: 'age maximum is 120 (max:120).' },
+  ],
+  '3.9': [
+    { re: /middleware\s*\(\s*['"]auth['"]/i, hint: "Apply Route::middleware('auth')." },
+    { re: /->group\s*\(/i, hint: 'Wrap the routes in ->group(function () { ... }).' },
+    { re: /\/account(?!\/edit)/i, hint: 'Include the /account route.' },
+    { re: /\/account\/edit/i, hint: 'Include the /account/edit route.' },
+  ],
+  '3.10': [
+    { re: /class\s+EnsureSubscribed/i, hint: 'Name the class EnsureSubscribed.' },
+    { re: /function\s+handle\s*\(/i, hint: 'Add a handle(Request $request, Closure $next) method.' },
+    { re: /is_subscribed/i, hint: 'Check $request->user()->is_subscribed.' },
+    { re: /abort\s*\(\s*403/i, hint: 'Abort with 403 when not subscribed: abort(403, ...).' },
+    { re: /return\s+\$next\s*\(\s*\$request/i, hint: 'Let valid requests through with return $next($request).' },
+  ],
+  '4.1': [
+    { re: /\/hello\/\{name\}/i, hint: 'Keep the /hello/{name} route pattern.' },
+    { re: /function\s*\(\s*\$name/i, hint: 'The fix: the closure must accept the parameter — function ($name).' },
+    { re: /\$name/, hint: 'Use $name in the returned string.' },
+  ],
+  '4.2': [
+    { re: /Post::where/i, hint: "Keep the Post::where('user_id', ...) filter." },
+    { re: /->get\s*\(/i, hint: 'The fix: add ->get() (or ->paginate()/->first()) so the query actually runs.' },
+  ],
+  '4.3': [
+    { re: /\$fillable/i, hint: 'The fix: declare protected $fillable on the Post model.' },
+    { re: /user_id/i, hint: 'Include user_id in $fillable (the controller mass-assigns it).' },
+    { re: /title/i, hint: 'Include title in $fillable.' },
+    { re: /body/i, hint: 'Include body in $fillable.' },
+  ],
+  '4.4': [
+    { re: /@foreach\s*\(\s*\$posts\s+as\s+\$post\b/i, hint: 'The fix: @foreach ($posts as $post) — collection on the left, item on the right.' },
+    { re: /\$post->title/i, hint: 'Print the singular item: {{ $post->title }}.' },
+  ],
+};

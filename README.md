@@ -64,6 +64,32 @@ Each lesson is an object inside `MODULES` in `lessons.js`:
 
 Append it to the right module's `lessons` array, save, refresh.
 
+### Exercise answer checking
+
+The **Check my answer** button analyzes the learner's input and reveals the reference solution. Each lesson has an entry in `EXERCISE_CHECKS` (bottom of `lessons.js`), keyed by lesson id:
+
+```js
+'3.11': [
+  { re: /Route::get/i, hint: 'Define the route with Route::get(...).' },
+  { re: /function\s*\(\s*\$name/i, hint: 'The closure must accept the {name} parameter.' },
+],
+```
+
+An answer is "correct" when **every** `re` matches — these check that the answer *addresses the problem* (key constructs/values), not that it matches the solution verbatim, so many valid styles pass. A failed `re` shows its `hint` as a fix-it note. If a lesson has no entry, the checker just reveals the solution for self-comparison.
+
+### Quizzes
+
+Quizzes live on their own **Quizzes** page (sidebar), organized **per topic (lesson)**. Each quiz draws up to `QUIZ_SIZE` (default 5, set in `app.js`) questions from that lesson's pool and shuffles both question order and answer order on every attempt — so aim for at least 5 questions per topic. Best score per topic is saved in `localStorage`.
+
+All questions live in a single `QUIZZES` map near the bottom of `lessons.js`, keyed by lesson id. A small loop attaches each set to its lesson as `lesson.quiz`, so the `MODULES` block stays free of quiz data. To add or edit questions, find the lesson's id in `QUIZZES`:
+
+```js
+'3.4': [
+  { q: 'Question?', options: ['a', 'b', 'c', 'd'], correct: 1, explain: 'Why' },
+  // ...
+],
+```
+
 ## Progress storage
 
-Stored in the browser only (`localStorage`, key `laravel-study-lab:progress`). To wipe it, click "Reset progress" in the sidebar, or clear site data in dev tools.
+Stored in the browser only: lesson progress under `laravel-study-lab:progress` and quiz best-scores under `laravel-study-lab:scores`. To wipe both, click "Reset progress" in the sidebar, or clear site data in dev tools.

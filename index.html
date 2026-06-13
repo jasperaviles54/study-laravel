@@ -13,6 +13,10 @@
       <h1>Laravel<br><span>Study Lab</span></h1>
       <div class="progress-summary" id="progressSummary">0% complete</div>
     </div>
+    <div class="main-nav">
+      <div class="nav-item active" data-nav="lessons">📚 Lessons</div>
+      <div class="nav-item" data-nav="quizzes">📝 Quizzes</div>
+    </div>
     <nav id="lessonNav"></nav>
     <div class="sidebar-footer">
       <button id="resetBtn" title="Wipe all progress">Reset progress</button>
@@ -28,8 +32,8 @@
       <ol>
         <li><strong>Read</strong> the concept on each lesson page.</li>
         <li><strong>Study</strong> the code example carefully — read every line.</li>
-        <li><strong>Try</strong> the exercise yourself before peeking at the solution.</li>
-        <li><strong>Quiz</strong> yourself — wrong answers explain why.</li>
+        <li><strong>Try</strong> the exercise, then hit <em>Check my answer</em> — it analyzes your input and tells you what to fix before revealing the reference solution.</li>
+        <li><strong>Test yourself</strong> on the <em>Quizzes</em> page — pick any topic for a short quiz of randomized questions, with the answer order shuffled every attempt.</li>
         <li><strong>Mark complete</strong> only when you genuinely understand it.</li>
       </ol>
 
@@ -65,18 +69,13 @@
         <div id="lessonExercise"></div>
         <textarea id="exerciseInput" placeholder="Type your answer here..."></textarea>
         <div class="exercise-buttons">
-          <button id="showSolutionBtn">Show solution</button>
-          <button id="hideSolutionBtn" class="hidden">Hide solution</button>
+          <button id="checkAnswerBtn">Check my answer</button>
         </div>
+        <div id="exerciseFeedback" class="hidden"></div>
         <div id="solutionBox" class="hidden">
-          <h4>Solution</h4>
+          <h4>Reference solution</h4>
           <div id="lessonSolution"></div>
         </div>
-      </section>
-
-      <section class="quiz" id="quizSection">
-        <h3>Quiz</h3>
-        <div id="lessonQuiz"></div>
       </section>
 
       <footer class="lesson-footer">
@@ -86,6 +85,10 @@
           <button id="nextBtn">Next →</button>
         </div>
       </footer>
+    </div>
+
+    <div id="quizView" class="view hidden">
+      <div id="quizBody"></div>
     </div>
   </main>
 </div>
