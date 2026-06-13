@@ -2,7 +2,6 @@
 
 const STORAGE_KEY = 'laravel-study-lab:progress';
 const SCORE_KEY = 'laravel-study-lab:scores';
-const QUIZ_SIZE = 5; // questions drawn per module quiz
 
 const state = {
   currentLessonId: null,
@@ -242,139 +241,170 @@ function renderQuizHome() {
   const scores = loadScores();
 
   let html = '<h2>Quizzes</h2>' +
-    `<p>Pick a topic below. Each quiz pulls up to <strong>${QUIZ_SIZE} questions</strong> from that lesson and shuffles both the question order and the answers, so every attempt is different.</p>`;
+    '<p>Pick a module to take its exam. All of that module\'s questions appear on one paper — answer them, then press <strong>Submit</strong> to see your score, the correct answers, and explanations. Answer order is shuffled each attempt.</p>' +
+    '<div class="quiz-modules">';
 
   MODULES.forEach(m => {
-    html += `<h3 class="quiz-module-heading">${m.title}</h3><div class="quiz-modules">`;
-    m.lessons.forEach(l => {
-      const count = (l.quiz || []).length;
-      const take = Math.min(QUIZ_SIZE, count);
-      const best = scores[l.id];
-      const bestStr = best != null ? ` · best ${best}/${take}` : '';
-      html += '<div class="quiz-module-card">' +
-        `<div><h3>${l.id} — ${l.title}</h3><p class="muted">${count} questions${bestStr}</p></div>` +
-        `<button class="start-quiz" data-lesson="${l.id}">Start quiz</button>` +
-        '</div>';
-    });
-    html += '</div>';
+    const total = m.lessons.reduce((n, l) => n + (l.quiz || []).length, 0);
+    const best = scores[m.id];
+    const bestStr = best != null ? ` · best ${best}/${total}` : '';
+    html += `<div class="quiz-module-card" data-module="${m.id}" role="button" tabindex="0">` +
+      `<div><h3>${m.title}</h3><p class="muted">${total} questions${bestStr}</p></div>` +
+      '<span class="card-cta">Take exam →</span>' +
+      '</div>';
   });
 
+  html += '</div>';
   body.innerHTML = html;
 
-  body.querySelectorAll('.start-quiz').forEach(b =>
-    b.addEventListener('click', () => startQuiz(b.dataset.lesson))
-  );
+  body.querySelectorAll('.quiz-module-card').forEach(card => {
+    const go = () => startExam(card.dataset.module);
+    card.addEventListener('click', go);
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+    });
+  });
 }
 
-// Build a topic quiz: draw up to QUIZ_SIZE questions from this lesson's pool,
-// shuffle their order, and shuffle each question's answer options.
-function buildQuiz(lesson) {
-  const pool = lesson.quiz || [];
-  const picked = shuffle(pool).slice(0, Math.min(QUIZ_SIZE, pool.length));
-  return picked.map(q => ({
-    q: q.q,
-    explain: q.explain,
-    // Flag the correct option, THEN shuffle — no fragile index tracking.
-    options: shuffle(q.options.map((text, i) => ({ text, correct: i === q.correct }))),
-  }));
+// Build a module exam: questions grouped by topic (lesson). Within each topic the
+// questions are shuffled, and each question's answer options are shuffled too.
+function buildExam(module) {
+  return module.lessons
+    .map(l => ({
+      topic: `${l.id} — ${l.title}`,
+      questions: shuffle(l.quiz || []).map(q => ({
+        q: q.q,
+        explain: q.explain,
+        options: shuffle(q.options.map((text, i) => ({ text, correct: i === q.correct }))),
+      })),
+    }))
+    .filter(t => t.questions.length);
 }
 
-function startQuiz(lessonId) {
-  const lesson = findLesson(lessonId);
-  if (!lesson) return;
-  renderActiveQuiz(lesson, buildQuiz(lesson));
+function startExam(moduleId) {
+  const module = MODULES.find(m => m.id === moduleId);
+  if (!module) return;
+  renderExam(module, buildExam(module));
   document.getElementById('content').scrollTop = 0;
 }
 
-function renderActiveQuiz(lesson, questions) {
+function renderExam(module, groups) {
   const body = document.getElementById('quizBody');
   body.innerHTML = '';
 
   const back = document.createElement('button');
   back.className = 'secondary quiz-back';
-  back.textContent = '← All quizzes';
+  back.textContent = '← All modules';
   back.addEventListener('click', renderQuizHome);
   body.appendChild(back);
 
   const heading = document.createElement('h2');
-  heading.textContent = `${lesson.id} — ${lesson.title}`;
+  heading.textContent = module.title;
   body.appendChild(heading);
 
-  const status = document.createElement('div');
-  status.className = 'quiz-status';
-  body.appendChild(status);
+  const total = groups.reduce((n, g) => n + g.questions.length, 0);
+  const intro = document.createElement('p');
+  intro.className = 'muted';
+  intro.textContent = `${total} questions. Answer them all, then press Submit to grade.`;
+  body.appendChild(intro);
 
-  let answered = 0;
-  let score = 0;
+  // Track each question's DOM + chosen option so we can grade on submit.
+  const items = [];
+  let graded = false;
+  let n = 0;
 
-  function updateStatus() {
-    status.textContent = `Answered ${answered}/${questions.length} · Score ${score}`;
-    if (answered === questions.length) {
-      const scores = loadScores();
-      if (scores[lesson.id] == null || score > scores[lesson.id]) {
-        scores[lesson.id] = score;
-        saveScores(scores);
-      }
-      const summary = document.createElement('div');
-      summary.className = 'quiz-summary';
-      summary.innerHTML = `<p><strong>Done! You scored ${score}/${questions.length}.</strong></p>`;
-      const retake = document.createElement('button');
-      retake.textContent = 'Retake (new shuffle)';
-      retake.addEventListener('click', () => startQuiz(lesson.id));
-      const home = document.createElement('button');
-      home.className = 'secondary';
-      home.textContent = '← All quizzes';
-      home.addEventListener('click', renderQuizHome);
-      summary.appendChild(retake);
-      summary.appendChild(home);
-      body.appendChild(summary);
-      summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-  }
+  groups.forEach(group => {
+    const topicHeading = document.createElement('h3');
+    topicHeading.className = 'quiz-module-heading';
+    topicHeading.textContent = group.topic;
+    body.appendChild(topicHeading);
 
-  updateStatus();
+    group.questions.forEach(q => {
+      n++;
+      const qDiv = document.createElement('div');
+      qDiv.className = 'quiz-question';
 
-  questions.forEach((q, qi) => {
-    const qDiv = document.createElement('div');
-    qDiv.className = 'quiz-question';
+      const qText = document.createElement('p');
+      qText.className = 'q-text';
+      qText.textContent = `${n}. ${q.q}`;
+      qDiv.appendChild(qText);
 
-    const qText = document.createElement('p');
-    qText.className = 'q-text';
-    qText.textContent = `${qi + 1}. ${q.q}`;
-    qDiv.appendChild(qText);
+      const item = { qDiv, explain: q.explain, optionEls: [], selectedEl: null };
 
-    let correctBtn = null;
-    q.options.forEach(opt => {
-      const btn = document.createElement('div');
-      btn.className = 'quiz-option';
-      btn.textContent = opt.text;
-      if (opt.correct) correctBtn = btn;
+      q.options.forEach(opt => {
+        const el = document.createElement('div');
+        el.className = 'quiz-option';
+        el.textContent = opt.text;
+        item.optionEls.push({ el, correct: opt.correct });
 
-      btn.addEventListener('click', () => {
-        if (qDiv.dataset.answered) return;
-        qDiv.dataset.answered = '1';
-        answered++;
+        el.addEventListener('click', () => {
+          if (graded) return;
+          item.optionEls.forEach(o => o.el.classList.remove('selected'));
+          el.classList.add('selected');
+          item.selectedEl = el;
+        });
 
-        if (opt.correct) {
-          btn.classList.add('correct');
-          score++;
-        } else {
-          btn.classList.add('wrong');
-          if (correctBtn) correctBtn.classList.add('correct');
-        }
-
-        const ex = document.createElement('div');
-        ex.className = 'quiz-explanation';
-        ex.textContent = q.explain;
-        qDiv.appendChild(ex);
-
-        updateStatus();
+        qDiv.appendChild(el);
       });
 
-      qDiv.appendChild(btn);
+      items.push(item);
+      body.appendChild(qDiv);
+    });
+  });
+
+  const actions = document.createElement('div');
+  actions.className = 'quiz-actions';
+  const submit = document.createElement('button');
+  submit.className = 'exam-submit';
+  submit.textContent = 'Submit exam';
+  actions.appendChild(submit);
+  body.appendChild(actions);
+
+  submit.addEventListener('click', () => {
+    if (graded) return;
+    graded = true;
+    let score = 0;
+
+    items.forEach(item => {
+      item.qDiv.dataset.answered = '1';
+      const correctEl = item.optionEls.find(o => o.correct).el;
+      if (item.selectedEl === correctEl) {
+        correctEl.classList.add('correct');
+        score++;
+      } else {
+        if (item.selectedEl) item.selectedEl.classList.add('wrong');
+        correctEl.classList.add('correct');
+      }
+      item.optionEls.forEach(o => o.el.classList.remove('selected'));
+
+      const ex = document.createElement('div');
+      ex.className = 'quiz-explanation';
+      ex.textContent = item.explain;
+      item.qDiv.appendChild(ex);
     });
 
-    body.appendChild(qDiv);
+    const scores = loadScores();
+    if (scores[module.id] == null || score > scores[module.id]) {
+      scores[module.id] = score;
+      saveScores(scores);
+    }
+
+    submit.remove();
+    const summary = document.createElement('div');
+    summary.className = 'quiz-summary';
+    const pct = Math.round((100 * score) / total);
+    summary.innerHTML = `<p><strong>You scored ${score}/${total} (${pct}%).</strong></p>`;
+    const retake = document.createElement('button');
+    retake.textContent = 'Retake (new shuffle)';
+    retake.addEventListener('click', () => startExam(module.id));
+    const home = document.createElement('button');
+    home.className = 'secondary';
+    home.textContent = '← All modules';
+    home.addEventListener('click', renderQuizHome);
+    summary.appendChild(retake);
+    summary.appendChild(home);
+    actions.appendChild(summary);
+    summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 }
 

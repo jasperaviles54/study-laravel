@@ -79,7 +79,7 @@ An answer is "correct" when **every** `re` matches — these check that the answ
 
 ### Quizzes
 
-Quizzes live on their own **Quizzes** page (sidebar), organized **per topic (lesson)**. Each quiz draws up to `QUIZ_SIZE` (default 5, set in `app.js`) questions from that lesson's pool and shuffles both question order and answer order on every attempt — so aim for at least 5 questions per topic. Best score per topic is saved in `localStorage`.
+Quizzes live on their own **Quizzes** page (sidebar) as one **exam paper per module**. Pick a module to see all its questions on a single page, grouped under topic headings; answer them and press **Submit** to grade — the score, correct answers, and per-question explanations are revealed at once. Question order (within a topic) and answer order are shuffled each attempt. Best score per module is saved in `localStorage`.
 
 All questions live in a single `QUIZZES` map near the bottom of `lessons.js`, keyed by lesson id. A small loop attaches each set to its lesson as `lesson.quiz`, so the `MODULES` block stays free of quiz data. To add or edit questions, find the lesson's id in `QUIZZES`:
 
