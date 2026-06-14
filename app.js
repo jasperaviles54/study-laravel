@@ -246,7 +246,7 @@ function renderQuizHome() {
     '<div class="quiz-modules">';
 
   MODULES.forEach(m => {
-    const total = m.lessons.reduce((n, l) => n + (l.quiz || []).length, 0);
+    const total = m.lessons.reduce((n, l) => n + Math.min(QUIZ_PER_TOPIC, (l.quiz || []).length), 0);
     const best = scores[m.id];
     const bestStr = best != null ? ` · best ${best}/${total}` : '';
     html += `<div class="quiz-module-card" data-module="${m.id}" role="button" tabindex="0">` +
@@ -367,19 +367,13 @@ function renderExam(module, groups) {
     if (graded) return;
     graded = true;
     let score = 0;
-    let skipped = 0;
 
     items.forEach(item => {
       item.qDiv.dataset.answered = '1';
 
-      // Only reveal feedback for questions the learner actually answered.
+      // Unanswered: counts as incorrect, but the answer is NOT revealed.
       if (!item.selectedEl) {
-        skipped++;
         item.qDiv.classList.add('skipped');
-        const note = document.createElement('div');
-        note.className = 'quiz-skip-note';
-        note.textContent = 'Skipped — answer hidden.';
-        item.qDiv.appendChild(note);
         return;
       }
 
@@ -409,10 +403,9 @@ function renderExam(module, groups) {
     const summary = document.createElement('div');
     summary.className = 'quiz-summary';
     const pct = Math.round((100 * score) / total);
-    const skipNote = skipped ? ` ${skipped} left blank — their answers stay hidden.` : '';
-    summary.innerHTML = `<p><strong>You scored ${score}/${total} (${pct}%).</strong>${skipNote}</p>`;
+    summary.innerHTML = `<p><strong>You scored ${score}/${total} (${pct}%).</strong></p>`;
     const retake = document.createElement('button');
-    retake.textContent = 'Retake (new shuffle)';
+    retake.textContent = 'Retake';
     retake.addEventListener('click', () => startExam(module.id));
     const home = document.createElement('button');
     home.className = 'secondary';
