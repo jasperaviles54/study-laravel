@@ -2,6 +2,7 @@
 
 const STORAGE_KEY = 'laravel-study-lab:progress';
 const SCORE_KEY = 'laravel-study-lab:scores';
+const QUIZ_PER_TOPIC = 5; // questions shown per topic, drawn at random from its larger bank
 
 const state = {
   currentLessonId: null,
@@ -272,7 +273,9 @@ function buildExam(module) {
   return module.lessons
     .map(l => ({
       topic: `${l.id} — ${l.title}`,
-      questions: shuffle(l.quiz || []).map(q => ({
+      // Draw QUIZ_PER_TOPIC at random from the topic's bank, so the extra
+      // (hidden) questions surface across shuffled attempts.
+      questions: shuffle(l.quiz || []).slice(0, QUIZ_PER_TOPIC).map(q => ({
         q: q.q,
         explain: q.explain,
         options: shuffle(q.options.map((text, i) => ({ text, correct: i === q.correct }))),
@@ -305,7 +308,7 @@ function renderExam(module, groups) {
   const total = groups.reduce((n, g) => n + g.questions.length, 0);
   const intro = document.createElement('p');
   intro.className = 'muted';
-  intro.textContent = `${total} questions. Answer them all, then press Submit to grade.`;
+  intro.textContent = `${total} questions, drawn at random from a larger bank (retake for a different set). Answer what you can, then Submit — only the questions you answered are revealed.`;
   body.appendChild(intro);
 
   // Track each question's DOM + chosen option so we can grade on submit.
@@ -364,15 +367,28 @@ function renderExam(module, groups) {
     if (graded) return;
     graded = true;
     let score = 0;
+    let skipped = 0;
 
     items.forEach(item => {
       item.qDiv.dataset.answered = '1';
+
+      // Only reveal feedback for questions the learner actually answered.
+      if (!item.selectedEl) {
+        skipped++;
+        item.qDiv.classList.add('skipped');
+        const note = document.createElement('div');
+        note.className = 'quiz-skip-note';
+        note.textContent = 'Skipped — answer hidden.';
+        item.qDiv.appendChild(note);
+        return;
+      }
+
       const correctEl = item.optionEls.find(o => o.correct).el;
       if (item.selectedEl === correctEl) {
         correctEl.classList.add('correct');
         score++;
       } else {
-        if (item.selectedEl) item.selectedEl.classList.add('wrong');
+        item.selectedEl.classList.add('wrong');
         correctEl.classList.add('correct');
       }
       item.optionEls.forEach(o => o.el.classList.remove('selected'));
@@ -393,7 +409,8 @@ function renderExam(module, groups) {
     const summary = document.createElement('div');
     summary.className = 'quiz-summary';
     const pct = Math.round((100 * score) / total);
-    summary.innerHTML = `<p><strong>You scored ${score}/${total} (${pct}%).</strong></p>`;
+    const skipNote = skipped ? ` ${skipped} left blank — their answers stay hidden.` : '';
+    summary.innerHTML = `<p><strong>You scored ${score}/${total} (${pct}%).</strong>${skipNote}</p>`;
     const retake = document.createElement('button');
     retake.textContent = 'Retake (new shuffle)';
     retake.addEventListener('click', () => startExam(module.id));

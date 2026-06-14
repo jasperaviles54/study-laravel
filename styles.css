@@ -430,6 +430,15 @@ button:hover { border-color: var(--accent); color: #fff; }
 button.secondary { background: transparent; color: var(--text-dim); }
 button.secondary:hover { color: #fff; }
 
+/* Skipped (unanswered) questions after submit — answer stays hidden */
+.quiz-question.skipped { opacity: 0.7; }
+.quiz-skip-note {
+  margin-top: 8px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-dim);
+}
+
 /* Lesson footer */
 .lesson-footer {
   margin-top: 40px;
@@ -482,8 +491,48 @@ button.secondary:hover { color: #fff; }
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* ---------- Responsive / mobile ---------- */
 @media (max-width: 900px) {
-  #app { flex-direction: column; }
-  #sidebar { width: 100%; height: auto; max-height: 240px; }
-  #content { padding: 24px; }
+  #app { flex-direction: column; height: auto; min-height: 100vh; }
+  #sidebar {
+    width: 100%;
+    height: auto;
+    max-height: 42vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  #content { padding: 28px 24px; height: auto; }
+  .view { max-width: 100%; }
+}
+
+@media (max-width: 560px) {
+  #content { padding: 18px 14px; }
+  #content h2 { font-size: 22px; }
+  #content h3 { font-size: 16px; margin: 22px 0 10px; }
+  #content ul, #content ol { margin-left: 18px; }
+
+  .brand { padding: 16px 16px 12px; }
+  .brand h1 { font-size: 19px; }
+  .main-nav { padding: 10px 12px 4px; }
+  .lesson-link { padding: 10px 16px; }
+
+  pre { font-size: 12.5px; padding: 12px; }
+  #content code:not(pre code) { font-size: 12px; }
+
+  .exercise { padding: 16px; }
+  #exerciseInput { min-height: 120px; }
+
+  /* Quiz cards + exam stack vertically with full-width tap targets */
+  .quiz-module-card { flex-direction: column; align-items: stretch; gap: 8px; }
+  .card-cta { align-self: flex-end; }
+  .quiz-option { padding: 12px; }
+  .quiz-question { padding-bottom: 14px; }
+
+  /* Buttons go full width and finger-sized */
+  button { padding: 11px 14px; width: 100%; }
+  .exercise-buttons, .nav-buttons, .quiz-actions { display: flex; flex-direction: column; gap: 8px; }
+  .lesson-footer { flex-direction: column; align-items: stretch; }
+  .quiz-summary { flex-direction: column; align-items: stretch; }
+  .quiz-summary p { margin: 0 0 4px; }
+  .quiz-back { width: auto; align-self: flex-start; }
 }
