@@ -1,96 +1,58 @@
 # Laravel Study Lab
 
-A self-contained, single-page study app for learning Laravel from scratch — no PHP background required. Lessons, code examples, exercises with solutions, and quizzes. Content targets **Laravel 13** (PHP 8.3+). Progress is saved in the browser via `localStorage`.
+> A self-contained, single-page web app that teaches Laravel from scratch — no PHP or framework background required.
 
-## Contents
+## 📖 Overview
 
-- **Module 1 — PHP Foundations** (8 lessons): types, arrays, control flow, functions, OOP, inheritance/interfaces/traits, namespaces, Composer
-- **Module 2 — Web & DB Basics** (3 lessons): HTTP, MVC, SQL
-- **Module 3 — Laravel Core** (10 lessons): install, routing, controllers, Blade, migrations, Eloquent, relationships, validation, auth, middleware
-- **Module 4 — Debug Challenges** (4 lessons): broken route, broken query, mass-assignment, broken Blade
-- **Module 5 — Build It** (9 lessons): a guided build-along capstone — create a real Laravel blog (setup, Breeze auth, posts, controllers/routes, Blade, validation, comments, testing, deploy). Requires a local Laravel install (PHP 8.3+, Composer, Node).
+Laravel Study Lab is a free, browser-based course that teaches Laravel step by step — from the basics of PHP all the way to building, testing, and deploying a real Laravel app. It's designed for someone starting from zero: everything is laid out in order, and the whole experience runs client-side with no accounts and no setup. Content targets **Laravel 13 / PHP 8.3+**.
 
-## Run it locally
+The site contains:
+- Step-by-step lessons with plain-English explanations
+- Worked code examples with syntax highlighting
+- Hands-on exercises with automatic answer-checking and reference solutions
+- Per-module exams with scoring and explanations
+- A guided capstone that builds a real Laravel blog end to end
 
-No build step, no dependencies. Open `index.html` in any browser.
+## ✨ Features
 
-## Deploy to Vercel
+- **Zero setup** — plain HTML/CSS/JS that runs straight in the browser.
+- **Smart exercise checking** — type your answer and hit *Check my answer*. It analyzes what you wrote, points out what's missing, and *then* shows the reference solution. It accepts any answer that addresses the problem, not just an exact match.
+- **Module exams** — each module's quiz is an exam paper: answer the questions, hit *Submit*, and get a score with the correct answers and explanations. Questions are drawn from a larger bank and shuffled every attempt, so retakes stay fresh.
+- **Progress that sticks** — completed lessons and best exam scores are saved in your browser.
+- **Polished UX** — syntax-highlighted code, a clean dark theme, and a mobile-friendly responsive layout.
 
-### Option A — Vercel CLI (fastest)
+## 📚 Curriculum
 
-```bash
-npx vercel
-```
+| Module | Focus | Lessons |
+| --- | --- | --- |
+| **1 — PHP Foundations** | Types, arrays, control flow, functions, OOP, interfaces/traits, namespaces, Composer | 8 |
+| **2 — Web & Database Basics** | HTTP, MVC, SQL | 3 |
+| **3 — Laravel Core** | Install, routing, controllers, Blade, migrations, Eloquent, relationships, validation, auth, middleware | 10 |
+| **4 — Debug Challenges** | Fix broken routes, queries, mass-assignment, and Blade | 4 |
+| **5 — Build It** | A guided build-along: create a real Laravel blog — setup, Breeze auth, posts, routes, Blade, validation, comments, testing, and deploy | 9 |
 
-Follow the prompts. Pick "Other" when asked about a framework.
+> **Module 5 is a build-along** that you follow on your own machine, so it assumes a local toolchain: **PHP 8.3+, Composer, and Node** (for Breeze/Vite assets).
 
-### Option B — GitHub + Vercel dashboard
+## 🛠️ Tech stack
 
-1. Push this repo to GitHub.
-2. On [vercel.com](https://vercel.com), import the repo.
-3. Framework preset: **Other**. Root directory: default. Deploy.
+Vanilla **HTML5, CSS, and JavaScript** — no framework, no build step, no dependencies. All lesson and quiz content lives as plain data in `lessons.js`, and `app.js` renders the interface, runs the exercise checker, and powers the exams.
 
-Future `git push` calls redeploy automatically.
+## 🌐 How to view
 
-## File layout
+**Live site:** https://study-laravel-five.vercel.app/
 
-```
-study-laravel/
-├── index.html      # page shell
-├── styles.css      # dark theme
-├── lessons.js      # all lesson content as JS data
-├── app.js          # navigation, quiz, progress logic
-├── vercel.json     # static-host config (cache headers, clean URLs)
-├── .gitignore
-└── README.md
-```
+To run it locally:
+1. Download or clone this repository.
+2. Open `index.html` in your browser.
 
-## Adding lessons
+## 🔒 Privacy
 
-Each lesson is an object inside `MODULES` in `lessons.js`:
+Nothing leaves your browser. Lesson progress and exam best-scores are stored locally via `localStorage`, and can be cleared anytime with **Reset progress** in the sidebar.
 
-```js
-{
-  id: '3.11',
-  title: 'Your new lesson',
-  concept: `<p>HTML for the concept...</p>`,
-  example: `<?php /* code */ ?>`,
-  exercise: `<p>What to do.</p>`,
-  solution: `<?php /* answer */ ?>`,
-  quiz: [
-    { q: 'Question?', options: ['a','b','c','d'], correct: 1, explain: 'Why' }
-  ]
-}
-```
+## 📄 License & usage
 
-Append it to the right module's `lessons` array, save, refresh.
+For educational and demonstration purposes. Laravel and related names are trademarks of their respective owners; any third-party material referenced in the lessons belongs to its owners.
 
-### Exercise answer checking
+## 🖼️ Preview
 
-The **Check my answer** button analyzes the learner's input and reveals the reference solution. Each lesson has an entry in `EXERCISE_CHECKS` (bottom of `lessons.js`), keyed by lesson id:
-
-```js
-'3.11': [
-  { re: /Route::get/i, hint: 'Define the route with Route::get(...).' },
-  { re: /function\s*\(\s*\$name/i, hint: 'The closure must accept the {name} parameter.' },
-],
-```
-
-An answer is "correct" when **every** `re` matches — these check that the answer *addresses the problem* (key constructs/values), not that it matches the solution verbatim, so many valid styles pass. A failed `re` shows its `hint` as a fix-it note. If a lesson has no entry, the checker just reveals the solution for self-comparison.
-
-### Quizzes
-
-Quizzes live on their own **Quizzes** page (sidebar) as one **exam paper per module**. Pick a module to see all its questions on a single page, grouped under topic headings; answer them and press **Submit** to grade — the score, correct answers, and per-question explanations are revealed at once. Question order (within a topic) and answer order are shuffled each attempt. Best score per module is saved in `localStorage`.
-
-All questions live in a single `QUIZZES` map near the bottom of `lessons.js`, keyed by lesson id. A small loop attaches each set to its lesson as `lesson.quiz`, so the `MODULES` block stays free of quiz data. To add or edit questions, find the lesson's id in `QUIZZES`:
-
-```js
-'3.4': [
-  { q: 'Question?', options: ['a', 'b', 'c', 'd'], correct: 1, explain: 'Why' },
-  // ...
-],
-```
-
-## Progress storage
-
-Stored in the browser only: lesson progress under `laravel-study-lab:progress` and quiz best-scores under `laravel-study-lab:scores`. To wipe both, click "Reset progress" in the sidebar, or clear site data in dev tools.
+![Laravel Study Lab homepage](preview.png)
